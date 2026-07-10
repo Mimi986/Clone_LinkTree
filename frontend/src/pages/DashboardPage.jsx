@@ -2,37 +2,49 @@ import React from 'react'
 import Input from '../components/Input'
 import { motion } from 'framer-motion'
 import { PencilLine,Plus,Check,X} from 'lucide-react'
-import { useState,useEffect } from 'react'
+import { useState} from 'react'
 import LinkCard from '../components/LinkCard'
+import { useDispatch } from 'react-redux'
+import { addLink,getAllLinks } from '../redux/linkSlice'
+import { useSelector } from 'react-redux'
 
 const DashboardPage = () => {
   const [name, setname] = useState("")  //jsp quoi mettre entre parentheses 
   const [email, setemail] = useState("")  //la aussi 
   const [bio, setbio] = useState("")
   const [isEditing, setisEditing] = useState(false)
-  const [addLink, setaddLink] = useState(false)
+  const [addlink, setaddlink] = useState(false)
   const [title, settitle] = useState("")
   const [dest, setdest] = useState("")
-  const [links, setlinks] = useState([])
 
-  useEffect(() => {
-    const fetchLinks = async () => {
-      try {
-        const response = await fetch('http://localhost://3000/api/admin/get-all-links',{
-          headers: {
-            'Authorization': `Bearer ${('token')}` 
-          }
-        });
-        const data = await response.json();
-        setLinks(data); 
-      } catch (error) {
-        console.error("Error in fetching links",error)
-      } 
-    };
-    fetchLinks();
-  }, []);
+  // useEffect(() => {
+  //   const fetchLinks = async () => {
+  //     try {
+  //       const response = await fetch('http://localhost://3000/api/admin/get-all-links',{
+  //         headers: {
+  //           'Authorization': `Bearer ${('token')}` 
+  //         }
+  //       });
+  //       const data = await response.json();
+  //       setLinks(data); 
+  //     } catch (error) {
+  //       console.error("Error in fetching links",error)
+  //     } 
+  //   };
+  //   fetchLinks();
+  // }, []);
     
-    
+  const dispatch = useDispatch()
+
+  const links = useSelector((state)=>state.links)
+
+    const handleAddLink = async(e) => {
+      e.preventDefault()
+      dispatch(addLink({title,dest}))
+    }
+
+    const handleGetAllLinks = async() => {
+      dispatch(getAllLinks()) }
 
   return (
     <div>
@@ -85,14 +97,14 @@ const DashboardPage = () => {
         <div className='flex justify-between'>
           <h1 className='text-gray-900 font-sans mb-2'>Links</h1>
           <button className='text-blue-500 hover:text-blue-300 flex'
-          onClick={()=>setaddLink(true)}
+          onClick={()=>setaddlink(true)}
           >
             <Plus/>Add</button>
          </div>   
          <div>
           {links.map((link)=>{<LinkCard/>})}
          </div>
-          {addLink && 
+          {addlink && 
           <div className='bg-[#3e4f6f] rounded-xl mt-4 mb-3 p-3'>
           <h2 className='text-blue-500 mb-2'>New Link</h2>  
             <Input
@@ -116,9 +128,9 @@ const DashboardPage = () => {
               <option>Youtube</option>
               <option>Other</option>
             </select>
-
+            {links.map((link)=>{<LinkCard/>})}
             <div className='flex gap-3 mt-3 px-30'>
-            <button className='bg-blue-500 hover:bg-blue-400 text-white rounded-lg p-1'><Check/></button>
+            <button className='bg-blue-500 hover:bg-blue-400 text-white rounded-lg p-1' onClick={handleAddLink}><Check/></button>
             <button className='text-gray-500 hover:text-white' onClick={()=>setaddLink(false)}><X/></button>
             </div>
             </div>

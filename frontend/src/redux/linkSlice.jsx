@@ -5,7 +5,11 @@ const baseUrl= "http://localhost:3000/api/admin"
 
 export const getAllLinks = createAsyncThunk("links/getAllLinks",
     async()=>{
-        const response = await fetch(baseUrl + '/get-all-links')
+        const response = await fetch(`${baseUrl}/get-all-links`,{
+            method:"GET",
+            headers:{"Content-Type":"application/json"},
+            credentials:"include"
+        })
         const data = await response.json()
         return data
     }
@@ -13,9 +17,10 @@ export const getAllLinks = createAsyncThunk("links/getAllLinks",
 
 export const addLink = createAsyncThunk("links/addLink",
     async(link)=>{
-        const response = fetch (baseUrl+'/add-link',{
+        const response = await fetch (`${baseUrl}/add-link`,{
             method:"POST",
             headers:{"Content-Type":"application/json"},
+            credentials: "include",
             body:JSON.stringify(link)
         })
         const data = await response.json()
@@ -28,6 +33,7 @@ export const deleteLink = createAsyncThunk("links/deleteLink",
         const response = await fetch(`${baseUrl}/delete-link/${id}`,{
             method:"DELETE",
             headers:{"Content-Type":"application/json"},
+            credentials:"include"
         })
         const data = await response.json()
         return data 
@@ -39,6 +45,7 @@ export const editLink = createAsyncThunk("links/editLink",
         const response = await fetch(`${baseUrl}/edit-link/${link.id}`,{
             method:"PUT",
             headers:{"Content-Type":"application/json"},
+            credentials:"include",
             body:JSON.stringify(link)
         })
         const data = await response.json()
@@ -51,6 +58,7 @@ export const activateLink = createAsyncThunk("links/activateLink",
         const response = await fetch(`${baseUrl}/activate-link/${link.id}`,{
             method:"PATCH",
             headers:{"Content-Type":"application/json"},
+            credentials:"include",
             body:JSON.stringify(link)
     })
         const data = await response.json()
@@ -63,6 +71,7 @@ export const deactivateLink = createAsyncThunk("links/deactivateLink",
         const response = await fetch(`${baseUrl}/deactivate-link/${link.id}`,{
             method:"PATCH",
             headers:{"Content-Type":"application/json"},
+            credentials:"include",
             body:JSON.stringify(link)
     })
         const data = await response.json()

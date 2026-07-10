@@ -3,10 +3,22 @@ import Input from '../components/Input'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { signin } from '../redux/userSlice'
+import { useNavigate } from 'react-router-dom'
 
 const LoginPage = () => {
   const [email, setemail] = useState("")
   const [password, setpassword] = useState("")
+
+  const dispatch = useDispatch()
+  const navigate=useNavigate()
+
+  const handleSignIn = async(e) => {
+    e.preventDefault()
+    dispatch(signin({email,password}))
+    navigate("/dashboard")
+  }
   return (
     <motion.div className='flex justify-center items-center flex-col w-full'>
         <h1 className='text-white text-2xl mb-2 font-semibold'>Welcome back</h1>
@@ -34,7 +46,9 @@ const LoginPage = () => {
     </form>
     <div className='flex flex-col'>
     <Link to="/forgot-password" className='text-blue-600 hover:underline'>Forgot password?</Link>
-    <motion.button className='hover:bg-blue-500 mt-5 py-3 px-4 rounded-2xl text-white bg-blue-700' whileHover={{scale:1.05}} whileTap={{scale:0.7}}>Sign in</motion.button>
+    <motion.button className='hover:bg-blue-500 mt-5 py-3 px-4 rounded-2xl text-white bg-blue-700' whileHover={{scale:1.05}} whileTap={{scale:0.7}}
+    onClick={handleSignIn}
+    >Sign in</motion.button>
     </div>
     </div>
     </motion.div>

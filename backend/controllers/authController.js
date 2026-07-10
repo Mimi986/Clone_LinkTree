@@ -21,20 +21,32 @@ if(adminAlreadyExists) throw new BadRequestError('a user with this email already
 })
     await admin.save()
     generateTokenAndSetCookie(res,admin._id)
-    res.status(StatusCodes.CREATED).json({msg:"user created successfully"})}
+    const { hidePassword, ...userWithoutPassword } = admin.toObject();
+    res.status(StatusCodes.CREATED).json({msg:"user created successfully",admin:userWithoutPassword})}
 
 export const signin = async (req,res) => {
     const {email,password} = req.body
     const admin = await Admin.findOne({email})
     if(!admin) throw new UnauthenticatedError("invalid credentials")
-        const hashedPassword = await bcryptjs.hash(password,10)
-        const isMatch = await bcryptjs.compare(password,hashedPassword)
+        const isMatch = await bcryptjs.compare(password,admin.password)
         if(!isMatch) throw new UnauthenticatedError("invalid credentials")
         generateTokenAndSetCookie(res,admin._id)
-        res.status(StatusCodes.CREATED).json({msg:'logged in successfully'})
+        const { password:_, ...userWithoutPassword } = admin.toObject();
+        res.status(StatusCodes.OK).json({msg:'logged in successfully',admin:userWithoutPassword})
 }
 
 export const logout = async(req,res) => {
     res.clearCookie("token")
     res.status(StatusCodes.Ok).json({msg:'logged out successfully'})
+}
+
+export const checkAuth = async(req,res) => {
+    try {
+        const user = await Admin.findById(req.userId).select("-password")
+        if(!user) throw new BadRequestError("user not found")
+        res.status(StatusCodes.OK).json({msg:"authenticated",user})  
+    } catch (error) {
+        console.log("error in check auth",error)
+        throw new UnauthenticatedError ("error in checkauth")
+    }
 }

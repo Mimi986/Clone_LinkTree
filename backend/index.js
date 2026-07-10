@@ -6,12 +6,15 @@ import authRouter from "./routes/authRouter.js"
 import cookieParser from "cookie-parser"
 import errorHandlerMiddleware from './middlewares/errorHandlerMiddleware.js'
 import { authenticateUser } from "./middlewares/authMiddleware.js"
+import cors from 'cors'
 
 dotenv.config()
 const app = express()
 
-app.use(express.json())
 
+
+app.use(cors({origin:"http://localhost:5173",credentials:true}))
+app.use(express.json())
 app.use(cookieParser())
 app.use("/api/auth",authRouter)
 app.use("/api/admin",authenticateUser,adminRouter)
