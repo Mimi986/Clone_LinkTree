@@ -6,11 +6,11 @@ import { addLink,editLink,deleteLink,activateLink,deactivateLink,editInfos,getAl
 import { validateLinkInput } from "../middlewares/validationMiddleware.js"
 
 router.post("/add-link",validateLinkInput,addLink)
-router.put("/edit-link:id",editLink)
-router.delete("/delete-link:id",deleteLink)
-router.patch("/activate-link:id",activateLink)
-router.patch("/deactivate-link:id",deactivateLink)
-router.post("/edit-infos:id",editInfos)
+router.put("/edit-link/:id",editLink)
+router.delete("/delete-link/:id",deleteLink)
+router.patch("/activate-link/:id",activateLink)
+router.patch("/deactivate-link/:id",deactivateLink)
+router.post("/edit-infos/:id",editInfos)
 router.get("/get-all-links",getAllLinks)
 router.get("/get-all-users",getAllUsers)
 

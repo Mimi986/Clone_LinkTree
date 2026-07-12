@@ -82,12 +82,10 @@ const SignUpPage = () => {
                 />
             </div>
         </form>
-            <p>Already have an account ? Click <Link to="/signin">here</Link> to sign in</p>
+            <p className='text-[#7f92ac] font-semibold'>Already have an account ? Click <Link to="/signin" className='underline text-blue-500'>here</Link> to sign in</p>
             <motion.button className='w-full mt-5 py-3 px-4 rounded-2xl text-white bg-blue-600 hover:bg-blue-500' whileHover={{scale:1.05}} whileTap={{scale:0.7}}
             onClick={handleSignUp}
-            >
-                Sign up 
-            </motion.button>
+            >Sign up</motion.button>
     </div>
 </motion.div>
   )

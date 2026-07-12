@@ -2,13 +2,13 @@ import React from 'react'
 import Input from '../components/Input'
 import { motion } from 'framer-motion'
 import { PencilLine,Plus,Check,X} from 'lucide-react'
-import { useState} from 'react'
+import { useState,useEffect} from 'react'
 import LinkCard from '../components/LinkCard'
-import { useDispatch } from 'react-redux'
-import { addLink,getAllLinks } from '../redux/linkSlice'
-import { useSelector } from 'react-redux'
+import { useDispatch,useSelector } from 'react-redux'
+import { addLink,getAllLinks,activateLink,deactivateLink,deleteLink,editLink } from '../redux/linkSlice'
 
 const DashboardPage = () => {
+
   const [name, setname] = useState("")  //jsp quoi mettre entre parentheses 
   const [email, setemail] = useState("")  //la aussi 
   const [bio, setbio] = useState("")
@@ -16,40 +16,81 @@ const DashboardPage = () => {
   const [addlink, setaddlink] = useState(false)
   const [title, settitle] = useState("")
   const [dest, setdest] = useState("")
-
-  // useEffect(() => {
-  //   const fetchLinks = async () => {
-  //     try {
-  //       const response = await fetch('http://localhost://3000/api/admin/get-all-links',{
-  //         headers: {
-  //           'Authorization': `Bearer ${('token')}` 
-  //         }
-  //       });
-  //       const data = await response.json();
-  //       setLinks(data); 
-  //     } catch (error) {
-  //       console.error("Error in fetching links",error)
-  //     } 
-  //   };
-  //   fetchLinks();
-  // }, []);
+ 
     
   const dispatch = useDispatch()
 
-  const links = useSelector((state)=>state.links)
+  const {list : links} = useSelector((state)=>state.links || {})
 
-    const handleAddLink = async(e) => {
+useEffect(() => {
+  dispatch(getAllLinks())
+}, [dispatch])
+
+
+  const handleAddLink = async(e) => {
       e.preventDefault()
-      dispatch(addLink({title,dest}))
-    }
+      try{
+      await dispatch(addLink({title,dest})).unwrap()
+      dispatch(getAllLinks())
+      settitle("")
+      setdest("")
+}    catch(error){
+  console.log("error in adding link",error)
+}
+}
 
-    const handleGetAllLinks = async() => {
+  const handleGetAllLinks = async() => {
       dispatch(getAllLinks()) }
 
-  return (
+
+  const handleDelete = (id)=>{
+    dispatch(deleteLink(id))
+  }
+
+  const handleActivate = (id) => {
+    dispatch(activateLink(id))
+  }
+
+  const handleDeactivate =(id)=>{
+    dispatch(deactivateLink(id))
+  }
+
+  const handleEditLink = async(link)=>{
+    try{
+      await dispatch(editLink(link)).unwrap()
+      dispatch(getAllLinks())
+    } catch(error){
+      console.log("error in editing link",error)
+    }
+  }
+const [editingLink,seteditingLink] = useState(null)
+
+  const handleeditlink = (link) => {
+    seteditingLink(link)
+    settitle(link.title)
+    setdest(link.dest)
+  }
+
+const handleSubmit = async(e) => {
+  e.preventDefault()
+  if(editingLink){
+    await dispatch(editLink({_id:editingLink._id,title,dest})).unwrap()
+    seteditingLink(null)
+  }else{
+    await dispatch(addLink({title,dest})).unwrap()
+  }
+  settitle("")
+  setdest("")
+  dispatch(getAllLinks())
+}  
+
+  let count = 0
+  const numOfActiveLinks = links.map((link)=>{if(link.active) return count++})
+
+return (
     <div>
       <h1 className='text-white font-semibold text-3xl mb-2'>Dashboard</h1>
-      <p>? active links</p>
+      <p>{count} active link(s)</p>
       <motion.div className='bg-[#394864] border border-[#5f779d] rounded-2xl p-4 flex flex-col mt-4' 
       initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{delay:0.2}}>
         <div className='flex'>
@@ -93,17 +134,33 @@ const DashboardPage = () => {
           </motion.div> }
       </motion.div>
 
-      <motion.div className='bg-[#394864] border border-[#5f779d] rounded-2xl p-4 flex flex-col mt-3'>
+      <motion.div className='bg-[#394864] border border-[#5f779d] rounded-2xl p-4 flex flex-col mt-3 w-100'>
         <div className='flex justify-between'>
-          <h1 className='text-gray-900 font-sans mb-2'>Links</h1>
+          <h1 className='text-gray-900 font-sans mb-2 text-[25px]'>Links</h1>
           <button className='text-blue-500 hover:text-blue-300 flex'
           onClick={()=>setaddlink(true)}
           >
-            <Plus/>Add</button>
-         </div>   
-         <div>
-          {links.map((link)=>{<LinkCard/>})}
-         </div>
+            <Plus size={30}/><span className='text-[23px]'>Add</span></button>
+         </div> 
+
+         {editingLink && 
+         <form onSubmit={handleSubmit}>
+          <Input
+          value={title} onChange={(e)=>settitle(e.target.value)}
+          placeholder={title}
+          type="text"
+          />
+          <Input
+          value={dest} onChange={(e)=>setdest(e.target.value)}
+          placeholder={dest}
+          type="text"/>
+          <div className='flex gap-3 justify-center'>
+          <button className='bg-blue-500 hover:bg-blue-400 text-white rounded-lg p-2'>Save</button>
+            <button className='text-gray-500 hover:text-white' onClick={()=>seteditingLink(null)}><X/></button>
+            </div>
+         </form>
+         }  
+         
           {addlink && 
           <div className='bg-[#3e4f6f] rounded-xl mt-4 mb-3 p-3'>
           <h2 className='text-blue-500 mb-2'>New Link</h2>  
@@ -128,13 +185,22 @@ const DashboardPage = () => {
               <option>Youtube</option>
               <option>Other</option>
             </select>
-            {links.map((link)=>{<LinkCard/>})}
             <div className='flex gap-3 mt-3 px-30'>
             <button className='bg-blue-500 hover:bg-blue-400 text-white rounded-lg p-1' onClick={handleAddLink}><Check/></button>
-            <button className='text-gray-500 hover:text-white' onClick={()=>setaddLink(false)}><X/></button>
+            <button className='text-gray-500 hover:text-white' onClick={()=>setaddlink(false)}><X/></button>
             </div>
             </div>
         }
+        <div className='flex flex-col mt-3 w-full'>
+            {links?.map((link)=>{ return (<LinkCard
+            key={link._id}
+            link={link}
+            onDelete={handleDelete}
+            onToggle = {(id)=>link.active ? handleDeactivate(id) : handleActivate(id)}
+            onEdit={(link)=>handleeditlink(link)}
+            />)})
+            }
+            </div>
       </motion.div>
     </div>
   )

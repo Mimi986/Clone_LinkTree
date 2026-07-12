@@ -42,7 +42,7 @@ export const deleteLink = createAsyncThunk("links/deleteLink",
 
 export const editLink = createAsyncThunk("links/editLink",
     async(link)=>{
-        const response = await fetch(`${baseUrl}/edit-link/${link.id}`,{
+        const response = await fetch(`${baseUrl}/edit-link/${link._id}`,{
             method:"PUT",
             headers:{"Content-Type":"application/json"},
             credentials:"include",
@@ -54,12 +54,11 @@ export const editLink = createAsyncThunk("links/editLink",
 )
 
 export const activateLink = createAsyncThunk("links/activateLink",
-    async(link)=>{
-        const response = await fetch(`${baseUrl}/activate-link/${link.id}`,{
+    async(id)=>{
+        const response = await fetch(`${baseUrl}/activate-link/${id}`,{
             method:"PATCH",
             headers:{"Content-Type":"application/json"},
             credentials:"include",
-            body:JSON.stringify(link)
     })
         const data = await response.json()
         return data 
@@ -67,12 +66,11 @@ export const activateLink = createAsyncThunk("links/activateLink",
 )
 
 export const deactivateLink = createAsyncThunk("links/deactivateLink",
-    async(link)=>{
-        const response = await fetch(`${baseUrl}/deactivate-link/${link.id}`,{
+    async(id)=>{
+        const response = await fetch(`${baseUrl}/deactivate-link/${id}`,{
             method:"PATCH",
             headers:{"Content-Type":"application/json"},
             credentials:"include",
-            body:JSON.stringify(link)
     })
         const data = await response.json()
         return data 
@@ -84,28 +82,33 @@ const linkSlice = createSlice({
     initialState:{
         list:[],
         status:"idle",
+        isLoading:false,
         error:null
     },
     reducers:{},
-    extrareducers:(builder)=>{
+    extraReducers:(builder)=>{
         builder
         .addCase(getAllLinks.pending,(state,action)=>{
             state.status = "Loading"
+            state.isLoading=true        
         })
+
         .addCase(getAllLinks.fulfilled,(state,action)=>{
             state.status = "Succedded"
+            state.isLoading=false
             state.list = action.payload.links
         })
-        .addCase(getAllLinks.failed,(state,action)=>{
+        .addCase(getAllLinks.rejected,(state,action)=>{
             state.status = "Failed"
-            status.error = action.error.message
+            state.isLoading=false
+            state.error = action.error.message
         })
 
         .addCase(editLink.fulfilled,(state,action)=>{
             state.status = "Succedded"
             const update = action.payload.updatedLink
-            const index = state.list.map((link)=>link.id===update.id)
-            if(index!==1){
+            const index = state.list.findIndex((link)=>link._id===update._id)
+            if(index!==-1){
             state.list[index] = update }
         })
 
@@ -116,14 +119,14 @@ const linkSlice = createSlice({
 
         .addCase(deleteLink.fulfilled,(state,action)=>{
             state.status="Succedded"
-            const deletedId = action.payload.id
-            state.list = state.list.filter((link)=>link.id!==deletedId)
+            const deletedId = action.payload.id 
+            state.list = state.list.filter((link)=>link._id!==deletedId)
         })
 
         .addCase(deactivateLink.fulfilled,(state,action)=>{
             state.status="Succedded"
             const deactivate = action.payload.deactivatedLink
-            const index = state.list.findIndex((link)=>deactivate.id===link.id)
+            const index = state.list.findIndex((link)=>deactivate._id===link._id)
             if(index!==-1){
                 state.list[index].active = false 
             }
@@ -132,7 +135,7 @@ const linkSlice = createSlice({
         .addCase(activateLink.fulfilled,(state,action)=>{
             state.status = "Succedded"
             const activate = action.payload.activatedLink
-            const index = state.list.findIndex((link)=>activate.id===link.id)
+            const index = state.list.findIndex((link)=>activate._id===link._id)
             if(index!==-1){
                 state.list[index].active = true 
             }
@@ -142,4 +145,4 @@ const linkSlice = createSlice({
 })
 
 
-export default linkSlice
+export default linkSlice.reducer

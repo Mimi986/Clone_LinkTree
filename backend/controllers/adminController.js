@@ -10,7 +10,8 @@ export const addLink = async (req,res) => {
 
 export const editLink = async (req,res) => {
   const {id} = req.params 
-  const updatedLink = await Link.findByIdAndUpdate(id,req.body,{new:true})
+  const {title,dest} = req.body 
+  const updatedLink = await Link.findByIdAndUpdate(id,{title,dest},{new:true})
   res.status(StatusCodes.OK).json({msg:'link edited successfully',updatedLink})
   }
 
@@ -23,6 +24,9 @@ export const deleteLink = async (req,res) => {
 export const deactivateLink = async(req,res) => {
   const {id} = req.params
   const deactivatedLink = await Link.findById(id)
+   if(!deactivatedLink){
+    return res.status(StatusCodes.NOT_FOUND).json({msg: "Link not found"})
+  }
   deactivatedLink.active = false 
   await deactivatedLink.save()
   res.status(StatusCodes.OK).json({msg:'link deactivated',deactivatedLink})
@@ -31,6 +35,7 @@ export const deactivateLink = async(req,res) => {
 export const activateLink = async(req,res)=>{
   const {id} = req.params
   const activatedLink = await Link.findById(id)
+  console.log('activatedLink trouvé:', activatedLink)
   activatedLink.active = true 
   await activatedLink.save()
   res.status(StatusCodes.OK).json({msg:'link activated',activatedLink})}

@@ -63,6 +63,10 @@ export const checkAuth = createAsyncThunk("users/checkAuth",
             credentials:"include"
         })
         const data = await response.json()
+         if(!response.ok){
+            return rejectWithValue(data)  
+        }
+        return data 
     }
 )
 
@@ -74,7 +78,7 @@ const userSlice = createSlice({
         isAuthenticated:false,
         error:null,
         isLoading:false,
-        isCheckignAuth:false,
+        authChecked:false,
         message:null
     },
     reducers:{},
@@ -124,20 +128,20 @@ const userSlice = createSlice({
             state.isAuthenticated=false 
         })
 
-        .addCase(checkAuth.fulfilled,(state)=>{
+        .addCase(checkAuth.fulfilled,(state,action)=>{
              state.user=action.payload.user
-             state.isCheckignAuth=false
+             state.authChecked=true
              state.error=null
              state.isAuthenticated=true
          })
 
-         .addCase(checkAuth.pending,(state)=>{
-             state.isCheckignAuth=true
-             state.error=null
-         })
+        //  .addCase(checkAuth.pending,(state)=>{
+        //      state.isCheckignAuth=true
+        //      state.error=null
+        //  })
 
-         .addCase(checkAuth.rejected,(state)=>{
-             state.isCheckignAuth=false
+         .addCase(checkAuth.rejected,(state,action)=>{
+             state.authChecked=true
              state.error=null
              state.isAuthenticated=false 
          })
