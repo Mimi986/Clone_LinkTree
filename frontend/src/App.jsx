@@ -9,16 +9,8 @@ import { Navigate } from "react-router-dom"
 import { useSelector } from "react-redux"
 import { useEffect } from "react"
 
-function App() {
-   
-  const dispatch = useDispatch()
-  const {isAuthenticated,authChecked} = useSelector((state)=>state.users)
-
-  useEffect(() => {
-    dispatch(checkAuth())
-  }, [dispatch])
-
-  const RedirectAuthenticateUser = ({children})=>{
+const RedirectAuthenticateUser = ({children})=>{
+    const {isAuthenticated,authChecked} = useSelector((state)=>state.users)
     if(isAuthenticated){
       return <Navigate to="/dashboard"/>
     }
@@ -26,7 +18,7 @@ function App() {
   }
 
   const ProtectedRoute = ({children}) => {
-    
+      const {isAuthenticated,authChecked} = useSelector((state)=>state.users)
     if(!authChecked){
       return <div>Loading ...</div>
     }
@@ -34,6 +26,17 @@ function App() {
       return <Navigate to="/signin"/>}
     return children 
   }
+
+function App() {
+   
+  const dispatch = useDispatch()
+
+
+  useEffect(() => {
+    dispatch(checkAuth())
+  }, [dispatch])
+
+  
 
   return (
     <>

@@ -32,23 +32,29 @@ export const validateRegisterInput = withValidationsErrors([
 
 export const validateIdParam = withValidationsErrors([
     param("id").custom(async(value,{req})=>{
-        const isValidId = mongoose.Types.ObjectId(value)
-        if(!isValidId){
+        if(! mongoose.Types.ObjectId(value)){
             throw new BadRequestError ("invalid mongodb id")
         }
-        const link = await Link.findById(id)
+        const link = await Link.findById(value)
         if(!link){
             throw new NotFoundError ("no link found with this id")
         }
-        const isOwner = req.user.userId === req.createdBy.toString()
+        const isOwner = req.user.userId === link.createdBy.toString()
         if (!isOwner) {
             throw new UnauthorizedError ("no permission to access this route")
         }
+        return true 
     })
 ])
 
 export const validateLinkInput = withValidationsErrors([
     body("title").notEmpty().withMessage("title is required"),
-    body("dest").notEmpty().withMessage("link is required")
+    body("dest").notEmpty().withMessage("link is required").isURL().withMessage("wrong url format")
+])
+
+export const validateUpdateInfosInput = withValidationsErrors([
+    body("name").optional().notEmpty().withMessage("name cannot be empty"),
+    body("bio").optional().isLength({max:200}).withMessage("bio cannot be empty")
+    //je dois rajouter la photo
 ])
 

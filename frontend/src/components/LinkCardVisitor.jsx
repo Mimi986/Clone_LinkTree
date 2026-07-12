@@ -3,17 +3,10 @@ import { MousePointerClick,Globe } from 'lucide-react'
 
 
 const LinkCardVisitor = ({icon}) => {
-  // const mapIcons = {
-  //   twitter : <SiX className='text-white'/>,
-  //   youtube : <SiYoutube/>,
-  //   github : <SiGithub/>,
-  //   instagram:<SiInstagram/>,
-  //   generic: <Globe/>
-  
-  //const iconConfig = mapIcons[icon] || mapIcons['generic']
+
   return (
-    <div className='flex'>
-        <span>pp</span>
+    <div className='flex bg-gray-400'>
+        <span></span>
         <h1 className='semi-bold'></h1>
         <MousePointerClick/>
     </div>

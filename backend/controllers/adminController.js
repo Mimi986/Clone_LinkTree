@@ -35,7 +35,6 @@ export const deactivateLink = async(req,res) => {
 export const activateLink = async(req,res)=>{
   const {id} = req.params
   const activatedLink = await Link.findById(id)
-  console.log('activatedLink trouvé:', activatedLink)
   activatedLink.active = true 
   await activatedLink.save()
   res.status(StatusCodes.OK).json({msg:'link activated',activatedLink})}
@@ -48,18 +47,21 @@ res.status(StatusCodes.OK).json({msg:'links retrieved', links})
 
 export const editInfos = async (req,res) => {
   const adminId = req.user.userId
+  if(!adminId){
+    return res.status(StatusCodes.NOT_FOUND).json({msg:'user not found'})
+  }
   const {name,photo,bio } = req.body 
-  const updatedInfosAdmin = await Admin.findByIdAndUpdate(adminId,{name,photo,bio},{new:true})
-  res.status(StatusCodes.OK).json({msg:'user infos updated'})
+  const updatedInfosAdmin = await Admin.findByIdAndUpdate(adminId,{name,photo,bio},{new:true}).select('-password')
+  res.status(StatusCodes.OK).json({msg:'user infos updated',updatedInfosAdmin})
 }
 
-export const getInfos = async (req,res) => {   //jsp si je vais l'inclure 
-  const {id} = req.user.userId
-  const user = await Admin.findById({id})
+export const getInfos = async (req,res) => {   
+  const id = req.user.userId
+  const user = await Admin.findById(id)
   res.status(StatusCodes.OK).json({msg:'infos retrieved',user})
 }
 
-export const getAllUsers = async (req,res) => {   //jsp si je dois le modifer pour que les users s'affichent 
-  const users = await Admin.find({})
-  res.status(StatusCodes.OK).json({msg:'users retrieved',users : () => users.map((user)=> ({...user._doc,password:undefined}))})
+export const getAllUsers = async (req,res) => {   
+  const users = await Admin.find({}).select('-password')
+  res.status(StatusCodes.OK).json({msg:'users retrieved',users})
 }

@@ -13,11 +13,13 @@ return (
       <GripVertical className='text-gray-800 hover:text-gray-600'/>
       <div className='flex flex-col flex-1 min-w-0'>
         <h1 className={link.active ? 'text-white text-[23px] font-semibold' : 'text-gray-500'}>{link.title}</h1>
-        <a href={link.dest}>{link.dest}</a>
-      </div>  
-        <button onClick={()=>onToggle(link._id)} className='hover:cursor-pointer rounded-full hover:bg-gray-800'>{link.active ? <ToggleRight className='text-green-600' size={25} strokeWidth={3}/> : <ToggleLeft className='text-gray-500' size={25}/>}</button>
-        <button onClick={()=>onEdit(link)} className='hover:cursor-pointer rounded-full hover:bg-gray-700'><PencilLine className='text-gray-400 hover:text-gray-500' size={22}/></button>
-        <button onClick={()=>onDelete(link._id)} className='hover:cursor-pointer rounded-full hover:bg-gray-700'><Trash2 className='text-gray-400 hover:text-red-400 ' size={22}/></button>
+        <a href={link.dest} className='text-[14px] text-gray-500 font-serif'>{link.dest}</a>
+      </div> 
+      <div className='mb-3.25'>
+        <button onClick={()=>onToggle(link._id)} className='hover:cursor-pointer rounded-full hover:bg-gray-800'>{link.active ? <ToggleRight className='text-green-600 mr-2' size={25} strokeWidth={3}/> : <ToggleLeft className='text-gray-500' size={25}/>}</button>
+        <button onClick={()=>onEdit(link)} className='hover:cursor-pointer rounded-full hover:bg-gray-700'><PencilLine className='text-gray-400 hover:text-gray-500 mr-2' size={22}/></button>
+        <button onClick={()=>onDelete(link._id)} className='hover:cursor-pointer rounded-full hover:bg-gray-700'><Trash2 className='text-gray-400 hover:text-red-400' size={22}/></button>
+      </div>   
       </div>
     </div>
   )

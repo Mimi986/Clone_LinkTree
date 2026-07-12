@@ -6,25 +6,30 @@ import { useState,useEffect} from 'react'
 import LinkCard from '../components/LinkCard'
 import { useDispatch,useSelector } from 'react-redux'
 import { addLink,getAllLinks,activateLink,deactivateLink,deleteLink,editLink } from '../redux/linkSlice'
+import { editInfos,getInfos, logout } from '../redux/userSlice'
 
 const DashboardPage = () => {
 
   const [name, setname] = useState("")  //jsp quoi mettre entre parentheses 
-  const [email, setemail] = useState("")  //la aussi 
+  const [email, setemail] = useState("")  
   const [bio, setbio] = useState("")
   const [isEditing, setisEditing] = useState(false)
   const [addlink, setaddlink] = useState(false)
   const [title, settitle] = useState("")
   const [dest, setdest] = useState("")
  
-    
   const dispatch = useDispatch()
 
   const {list : links} = useSelector((state)=>state.links || {})
+  const {user} = useSelector((state)=>state.users)
 
-useEffect(() => {
+  useEffect(() => {
   dispatch(getAllLinks())
-}, [dispatch])
+  }, [dispatch])
+
+  useEffect(()=>{
+    dispatch(getInfos())
+   },[dispatch])
 
 
   const handleAddLink = async(e) => {
@@ -87,6 +92,28 @@ const handleSubmit = async(e) => {
   let count = 0
   const numOfActiveLinks = links.map((link)=>{if(link.active) return count++})
 
+    useEffect(() => {
+  if (user) {
+    setname(user.name || "")
+    setbio(user.bio || "")
+  }
+}, [user])
+
+    const handleSubmitInfos = async(e) => {
+      e.preventDefault()
+      try{
+      await dispatch(editInfos({name,bio})).unwrap()
+      dispatch(getInfos())
+    }catch(error){
+      console.error(error)
+    }
+    }
+
+    const handleLogout = async(e)=>{
+      e.preventDefault()
+      await dispatch(logout()).unwrap()
+    }
+
 return (
     <div>
       <h1 className='text-white font-semibold text-3xl mb-2'>Dashboard</h1>
@@ -95,43 +122,37 @@ return (
       initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{delay:0.2}}>
         <div className='flex'>
         <img alt="Profile Picture" className='w-20 h-20 rounded-full'/>
-        <div className='flex flex-col'>
+        {/* <div className='flex flex-col'>
         <h1>{name}</h1>
         <p>{email}</p>
-        </div>
+        </div> */}
         <button className='text-blue-500 rounded-2xl border border-blue-300 hover:bg-gray-600 flex items-center gap-2 h-6'
         onClick={()=>setisEditing(true)}>
           <PencilLine size={15} className='ml-2'/>
           <span className='mr-2'>Edit the profile</span></button>
         </div> 
-          {isEditing && <motion.div initial={{opacity:0,y:15}} animate={{opacity:1,y:2}} transition={{delay:0.1}}
-          className='mt-2'
+          {isEditing && <motion.form initial={{opacity:0,y:15}} animate={{opacity:1,y:2}} transition={{delay:0.1}}
+          className='mt-2' onSubmit={handleSubmitInfos}
           >
              <img/>
              <p className='text-gray-900 font-sans mb-4 mt-2'>Edit your profile picture</p>
              <Input
              type="text"
-             placeholder="Enter your name"
+             placeholder=""
              value={name}
               onChange={(e)=>setname(e.target.value)}
              />
              <Input
              type="text"
-             placeholder="Enter your email"
-             value={email}
-              onChange={(e)=>setname(e.target.value)}
-             />
-             <Input
-             type="text"
-             placeholder="Write a few words about yourself"
+             placeholder=""
             value={bio}
             onChange={(e)=>setbio(e.target.value)}
             />
-             <button className='hover:text-white text-gray-400 mr-3'
+             <button className='hover:text-white text-gray-400 mr-3' type="button"
             onClick={()=>setisEditing(false)}
              >Cancel</button>
-             <button className='bg-blue-700 text-white rounded-xl hover:bg-blue-500 py-3 px-4'>Save</button>
-          </motion.div> }
+             <button className='bg-blue-700 text-white rounded-xl hover:bg-blue-500 py-3 px-4' type="submit">Save</button>
+          </motion.form> }
       </motion.div>
 
       <motion.div className='bg-[#394864] border border-[#5f779d] rounded-2xl p-4 flex flex-col mt-3 w-100'>
@@ -147,15 +168,15 @@ return (
          <form onSubmit={handleSubmit}>
           <Input
           value={title} onChange={(e)=>settitle(e.target.value)}
-          placeholder={title}
+          placeholder=""
           type="text"
           />
           <Input
           value={dest} onChange={(e)=>setdest(e.target.value)}
-          placeholder={dest}
+          placeholder=""
           type="text"/>
           <div className='flex gap-3 justify-center'>
-          <button className='bg-blue-500 hover:bg-blue-400 text-white rounded-lg p-2'>Save</button>
+          <button className='bg-blue-500 hover:bg-blue-400 text-white rounded-lg p-2' onClick={()=>setisEditing(false)}>Save</button>
             <button className='text-gray-500 hover:text-white' onClick={()=>seteditingLink(null)}><X/></button>
             </div>
          </form>
@@ -202,6 +223,7 @@ return (
             }
             </div>
       </motion.div>
+      <button className='bg-red-500 text-white w-full mt-3 rounded-2xl py-3 hover:bg-red-400 hover:cursor-pointer' onClick={handleLogout}>Logout</button>
     </div>
   )
 }

@@ -37,7 +37,7 @@ export const signin = async (req,res) => {
 
 export const logout = async(req,res) => {
     res.clearCookie("token")
-    res.status(StatusCodes.Ok).json({msg:'logged out successfully'})
+    res.status(StatusCodes.OK).json({msg:'logged out successfully'})
 }
 
 export const checkAuth = async(req,res) => {
