@@ -114,22 +114,6 @@ export const getInfos = createAsyncThunk("links/get-infos",
     }}
 )
 
-export const getAllUsers = createAsyncThunk("users/getUsers",
-    async()=>{
-        const response = await fetch(`http://localhost:3000/api/admin/get-all-users`,{
-            method:"GET",
-            headers:{"Content-Type":"application/json"},
-            credentials:"include",
-            body:JSON.stringify()
-        })
-        const data = await response.json()
-        if(!response.ok){
-            console.log("error in fetching the users")
-        }
-        return data 
-    }
-)
-
 const userSlice = createSlice({
     name:"users",
     initialState:{
@@ -235,23 +219,7 @@ const userSlice = createSlice({
             state.isLoading=false
             state.error=action.payload 
          })         
-
-         .addCase(getAllUsers.fulfilled,(state,action)=>{
-            state.status="Fulfilled"
-            state.isLoading=false
-            state.list = action.payload.users
-         })
-
-         .addCase(getAllUsers.pending,(state,action)=>{
-            state.status="Pending"
-            state.isLoading=true
-         })
-
-        .addCase(getAllUsers.rejected,(state,action)=>{
-            state.status="Failed"
-            state.isLoading=false
-            state.error=action.payload 
-         })         
+    
     }
 })
 

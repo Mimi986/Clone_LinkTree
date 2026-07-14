@@ -3,13 +3,15 @@ import Input from '../components/Input'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { signin } from '../redux/userSlice'
 import { useNavigate } from 'react-router-dom'
 
 const LoginPage = () => {
   const [email, setemail] = useState("")
   const [password, setpassword] = useState("")
+
+  const {error,isLoading} = useSelector((state)=>state.users)
 
   const dispatch = useDispatch()
   const navigate=useNavigate()
@@ -43,12 +45,13 @@ const LoginPage = () => {
             onChange={(e)=>{setpassword(e.target.value)}}
             />
         </div>
+        {error && <p className='text-red-500 font-semibold mt-2'>{error}</p>}
     </form>
     <div className='flex flex-col'>
     <Link to="/forgot-password" className='text-blue-600 hover:underline'>Forgot password?</Link>
     <motion.button className='hover:bg-blue-500 mt-5 py-3 px-4 rounded-2xl text-white bg-blue-700' whileHover={{scale:1.05}} whileTap={{scale:0.7}}
     onClick={handleSignIn}
-    >Sign in</motion.button>
+    >{isLoading ? "Loading..." : "Sign in"}</motion.button>
     </div>
     </div>
     </motion.div>

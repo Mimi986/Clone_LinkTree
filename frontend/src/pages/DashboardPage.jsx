@@ -10,13 +10,15 @@ import { editInfos,getInfos, logout } from '../redux/userSlice'
 
 const DashboardPage = () => {
 
-  const [name, setname] = useState("")  //jsp quoi mettre entre parentheses 
+  const [name, setname] = useState("")  
   const [email, setemail] = useState("")  
   const [bio, setbio] = useState("")
   const [isEditing, setisEditing] = useState(false)
   const [addlink, setaddlink] = useState(false)
   const [title, settitle] = useState("")
   const [dest, setdest] = useState("")
+
+  const [activeCard, setactiveCard] = useState(null)
  
   const dispatch = useDispatch()
 
@@ -94,8 +96,8 @@ const handleSubmit = async(e) => {
 
     useEffect(() => {
   if (user) {
-    setname(user.name || "")
-    setbio(user.bio || "")
+    setname(user.name)
+    setbio(user.bio)
   }
 }, [user])
 
@@ -122,11 +124,11 @@ return (
       initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{delay:0.2}}>
         <div className='flex'>
         <img alt="Profile Picture" className='w-20 h-20 rounded-full'/>
-        {/* <div className='flex flex-col'>
+        <div className='flex flex-col'>
         <h1>{name}</h1>
-        <p>{email}</p>
-        </div> */}
-        <button className='text-blue-500 rounded-2xl border border-blue-300 hover:bg-gray-600 flex items-center gap-2 h-6'
+        {/* <p>{email}</p> */}
+        </div> 
+        <button className='text-blue-500 rounded-2xl border border-blue-300 hover:bg-gray-600 flex items-center gap-2 h-6 hover:cursor-pointer'
         onClick={()=>setisEditing(true)}>
           <PencilLine size={15} className='ml-2'/>
           <span className='mr-2'>Edit the profile</span></button>
@@ -219,6 +221,7 @@ return (
             onDelete={handleDelete}
             onToggle = {(id)=>link.active ? handleDeactivate(id) : handleActivate(id)}
             onEdit={(link)=>handleeditlink(link)}
+            setactiveCard={setactiveCard}
             />)})
             }
             </div>

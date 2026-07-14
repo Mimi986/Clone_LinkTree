@@ -61,7 +61,23 @@ export const getInfos = async (req,res) => {
   res.status(StatusCodes.OK).json({msg:'infos retrieved',user})
 }
 
-export const getAllUsers = async (req,res) => {   
-  const users = await Admin.find({}).select('-password')
-  res.status(StatusCodes.OK).json({msg:'users retrieved',users})
+// export const getAllUsers = async (req,res) => {   
+//   const currentUserId = req.user.userId
+//   const users = await Admin.find({_id:{$ne:currentUserId}}).select('-password')   
+//   res.status(StatusCodes.OK).json({msg:'users retrieved',users})
+// }
+
+// export const getPublicLinks = async(req,res)=>{
+//   const {name} = req.params 
+//   const user = await Admin.findOne({name}).select('-password')
+// }
+
+export const getUserWithLinks = async(req,res)=>{
+  const currentUserId = req.user.userId
+  const users = await Admin.find({_id:{ $ne:currentUserId}}).select('-password')     //récupère tous les utilasateurs dont l'id n'est pas égal à celui de l'utilisateur courant 
+  const usersWithLinks = await Promise.all (users.map (async(user)=>{
+    const links = await Link.find({createdBy:user._id,active:true})
+    return {user,links}
+  }))
+  res.status(StatusCodes.OK).json({msg:'links retrieved',usersWithLinks})
 }
