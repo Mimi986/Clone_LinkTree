@@ -5,8 +5,9 @@ import { PencilLine,Plus,Check,X} from 'lucide-react'
 import { useState,useEffect} from 'react'
 import LinkCard from '../components/LinkCard'
 import { useDispatch,useSelector } from 'react-redux'
-import { addLink,getAllLinks,activateLink,deactivateLink,deleteLink,editLink } from '../redux/linkSlice'
+import { addLink,getAllLinks,activateLink,deactivateLink,deleteLink,editLink, reorderLinks } from '../redux/linkSlice'
 import { editInfos,getInfos, logout } from '../redux/userSlice'
+import DroppingArea from '../components/DroppingArea'
 
 const DashboardPage = () => {
 
@@ -22,7 +23,7 @@ const DashboardPage = () => {
  
   const dispatch = useDispatch()
 
-  const {list : links} = useSelector((state)=>state.links || {})
+  const {list : links,error} = useSelector((state)=>state.links || {})
   const {user} = useSelector((state)=>state.users)
 
   useEffect(() => {
@@ -116,6 +117,16 @@ const handleSubmit = async(e) => {
       await dispatch(logout()).unwrap()
     }
 
+    const onDrop = (position) => {
+      if(activeCard==null || activeCard===undefined) return 
+
+      const linkToMove = links[activeCard]
+      const updatedLinks = links.filter((_,index)=>index!==activeCard)
+      updatedLinks.splice(position,0,linkToMove)
+      dispatch(reorderLinks(updatedLinks))
+      setactiveCard(null)
+    }
+
 return (
     <div>
       <h1 className='text-white font-semibold text-3xl mb-2'>Dashboard</h1>
@@ -126,7 +137,7 @@ return (
         <img alt="Profile Picture" className='w-20 h-20 rounded-full'/>
         <div className='flex flex-col'>
         <h1>{name}</h1>
-        {/* <p>{email}</p> */}
+        <p>{email}</p>
         </div> 
         <button className='text-blue-500 rounded-2xl border border-blue-300 hover:bg-gray-600 flex items-center gap-2 h-6 hover:cursor-pointer'
         onClick={()=>setisEditing(true)}>
@@ -215,14 +226,25 @@ return (
             </div>
         }
         <div className='flex flex-col mt-3 w-full'>
-            {links?.map((link)=>{ return (<LinkCard
-            key={link._id}
-            link={link}
-            onDelete={handleDelete}
-            onToggle = {(id)=>link.active ? handleDeactivate(id) : handleActivate(id)}
-            onEdit={(link)=>handleeditlink(link)}
-            setactiveCard={setactiveCard}
-            />)})
+            <DroppingArea
+            onDrop={()=>onDrop(0)}
+            />
+            {links?.map((link,index)=>{ return (
+            <React.Fragment key={index}>
+                <LinkCard
+              key={link._id}
+              link={link}
+              onDelete={handleDelete}
+              onToggle = {(id)=>link.active ? handleDeactivate(id) : handleActivate(id)}
+              onEdit={(link)=>handleeditlink(link)}
+              index={index}
+              setactiveCard={setactiveCard}
+              />
+            <DroppingArea
+            onDrop={()=>onDrop(index+1)}
+            />
+            </React.Fragment>
+            )})
             }
             </div>
       </motion.div>

@@ -5,8 +5,6 @@ import { generateTokenAndSetCookie } from "../utils/generateTokenAndSetCookie.js
 import { BadRequestError,UnauthenticatedError} from "../errors/customError.js";
 import { StatusCodes } from "http-status-codes";
 
-//rajouter checkAuth 
-
 export const signup = async (req,res) => {
 const {name,email,password,photo,bio} = req.body 
 const adminAlreadyExists = await Admin.findOne({email})

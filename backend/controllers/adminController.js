@@ -1,11 +1,19 @@
 import Admin from "../models/adminModel.js";
 import { StatusCodes } from "http-status-codes";
 import Link from "../models/linkModel.js"
+import { BadRequestError } from "../errors/customError.js";
 
 export const addLink = async (req,res) => {
   req.body.createdBy = req.user.userId
-  const link = await Link.create(req.body)
+  const count = Admin.countDocuments({user:req.user.userId})
+  const link = await Link.create({
+    title,
+    dest,
+    createdBy,
+    position:count
+  })
   res.status(StatusCodes.CREATED).json({msg:'link added successfully',link})
+
 }
 
 export const editLink = async (req,res) => {
@@ -18,15 +26,14 @@ export const editLink = async (req,res) => {
 export const deleteLink = async (req,res) => {
  const {id} = req.params 
  const deletedLink = await Link.findByIdAndDelete(id)
+ 
  res.status(StatusCodes.OK).json({msg:'link deleted successfully',id})
 }
 
 export const deactivateLink = async(req,res) => {
   const {id} = req.params
   const deactivatedLink = await Link.findById(id)
-   if(!deactivatedLink){
-    return res.status(StatusCodes.NOT_FOUND).json({msg: "Link not found"})
-  }
+   if(!deactivatedLink) throw new BadRequestError("link not found")
   deactivatedLink.active = false 
   await deactivatedLink.save()
   res.status(StatusCodes.OK).json({msg:'link deactivated',deactivatedLink})
@@ -35,6 +42,7 @@ export const deactivateLink = async(req,res) => {
 export const activateLink = async(req,res)=>{
   const {id} = req.params
   const activatedLink = await Link.findById(id)
+   if(!activatedLink) throw new BadRequestError("link not found")
   activatedLink.active = true 
   await activatedLink.save()
   res.status(StatusCodes.OK).json({msg:'link activated',activatedLink})}
@@ -47,9 +55,7 @@ res.status(StatusCodes.OK).json({msg:'links retrieved', links})
 
 export const editInfos = async (req,res) => {
   const adminId = req.user.userId
-  if(!adminId){
-    return res.status(StatusCodes.NOT_FOUND).json({msg:'user not found'})
-  }
+  if(!adminId) throw new BadRequestError("user not found")
   const {name,photo,bio } = req.body 
   const updatedInfosAdmin = await Admin.findByIdAndUpdate(adminId,{name,photo,bio},{new:true}).select('-password')
   res.status(StatusCodes.OK).json({msg:'user infos updated',updatedInfosAdmin})
@@ -58,26 +64,26 @@ export const editInfos = async (req,res) => {
 export const getInfos = async (req,res) => {   
   const id = req.user.userId
   const user = await Admin.findById(id)
+   if(!user) throw new BadRequestError("user not found")
   res.status(StatusCodes.OK).json({msg:'infos retrieved',user})
 }
 
-// export const getAllUsers = async (req,res) => {   
-//   const currentUserId = req.user.userId
-//   const users = await Admin.find({_id:{$ne:currentUserId}}).select('-password')   
-//   res.status(StatusCodes.OK).json({msg:'users retrieved',users})
-// }
-
-// export const getPublicLinks = async(req,res)=>{
-//   const {name} = req.params 
-//   const user = await Admin.findOne({name}).select('-password')
-// }
-
-export const getUserWithLinks = async(req,res)=>{
-  const currentUserId = req.user.userId
-  const users = await Admin.find({_id:{ $ne:currentUserId}}).select('-password')     //récupère tous les utilasateurs dont l'id n'est pas égal à celui de l'utilisateur courant 
-  const usersWithLinks = await Promise.all (users.map (async(user)=>{
-    const links = await Link.find({createdBy:user._id,active:true})
-    return {user,links}
-  }))
-  res.status(StatusCodes.OK).json({msg:'links retrieved',usersWithLinks})
+export const getUserLinksPublic = async(req,res)=>{
+  const {name} = req.params
+  const user = await Admin.findOne({name}).select('-password') 
+  if(!user) throw new BadRequestError("user not found")
+  const links = await Link.find({createdBy:user._id,active:true})
+  res.status(StatusCodes.OK).json({msg:'user retrieved',user,links})
 }
+
+export const reorderLinks = async(req,res) => {
+  const {orderedLinks} = req.body 
+  const newlyOrderedLinks = orderedLinks.map((link,index)=>({
+    updateOne:{
+      filter:{ _id:link._id},
+      update:{position:index}
+    }
+  }))
+  await Link.bulkWrite(newlyOrderedLinks)
+  res.status(StatusCodes.OK).json({msg:'links reordered successfully'})
+  }

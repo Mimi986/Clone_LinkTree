@@ -5,11 +5,12 @@ import {useDispatch} from 'react-redux'
 import {deleteLink,activateLink,deactivateLink} from '../redux/linkSlice'
 import { GripVerticalIcon } from 'lucide-react'
 
-const LinkCard = ({link,onDelete,onToggle,onEdit,setactiveCard}) => {
+const LinkCard = ({link,onDelete,onToggle,onEdit,index,setactiveCard}) => {
   
 return (
-    <div className='flex flex-col gap-3 w-full ml-2' draggable>
-    <div className='flex w-full hover:cursor-pointer gap-2 items-center justify-between py-4 -mx-4'>
+    <div className='flex flex-col gap-3 w-full ml-2 hover:cursor-grab' draggable 
+    onDragStart={()=>setactiveCard(index)} onDragEnd={()=>setactiveCard(null)}>
+    <div className='flex w-full gap-2 items-center justify-between py-4 -mx-4'>
       <GripVertical className='text-gray-800 hover:text-gray-600'/>
       <div className='flex flex-col flex-1 min-w-0'>
         <h1 className={link.active ? 'text-white text-[23px] font-semibold' : 'text-gray-500'}>{link.title}</h1>

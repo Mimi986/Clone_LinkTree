@@ -77,6 +77,22 @@ export const deactivateLink = createAsyncThunk("links/deactivateLink",
     }
 )
 
+export const reorderLinks = createAsyncThunk("links/reorderLinks",
+    async(orderedLinks,{rejectWithValue})=>{
+      try{  const response = await fetch(`${baseUrl}/reorder-links`,{
+            method:"PATCH",
+            headers:{"Content-Type":"application/json"},
+            credentials:"include",
+            body:JSON.stringify({orderedLinks})
+        })
+        if(!response.ok) throw new Error("error in reordering the links")
+        return orderedLinks
+    }
+    catch(error){
+        return rejectWithValue(error);
+    }}
+)
+
 
 const linkSlice = createSlice({
     name:"links",
@@ -86,7 +102,11 @@ const linkSlice = createSlice({
         isLoading:false,
         error:null
     },
-    reducers:{},
+    reducers:{
+        // reorderLinks:(state,action)=>{
+        //     state.list = action.payload 
+        // }
+    },
     extraReducers:(builder)=>{
         builder
         .addCase(getAllLinks.pending,(state,action)=>{
@@ -141,9 +161,25 @@ const linkSlice = createSlice({
                 state.list[index].active = true 
             }
         })
+
+        .addCase(reorderLinks.fulfilled,(state,action)=>{
+            state.status="Succedded",
+            state.isLoading=false,
+            state.list = action.payload
+        })
+
+        .addCase(reorderLinks.pending,(state,action)=>{
+            state.status="Pending",
+            state.isLoading=true         
+        })
+
+        .addCase(reorderLinks.rejected,(state,action)=>{
+            state.status="Failed",
+            state.isLoading=false,
+            state.error = action.payload 
+        })
         
     }
 })
-
 
 export default linkSlice.reducer

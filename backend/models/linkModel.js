@@ -11,6 +11,7 @@ const linkSchema = new mongoose.Schema({
         type:Boolean,
         default:true
     },
+    position:Number,
     createdBy:{
         type:mongoose.Types.ObjectId,
         ref:"Admin"

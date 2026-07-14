@@ -8,6 +8,7 @@ import { useDispatch } from "react-redux"
 import { Navigate } from "react-router-dom"
 import { useSelector } from "react-redux"
 import { useEffect } from "react"
+import Header from "./components/Header"
 
 const RedirectAuthenticateUser = ({children})=>{
     const {isAuthenticated,authChecked} = useSelector((state)=>state.users)
@@ -36,10 +37,9 @@ function App() {
     dispatch(checkAuth())
   }, [dispatch])
 
-  
-
   return (
     <>
+    <Header></Header>
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden  bg-linear-to-br from-gray-300 via-gray-500 to-blue-950">
       <Routes>
         <Route path="/" element={<RedirectAuthenticateUser><SignUpPage/></RedirectAuthenticateUser>}/>

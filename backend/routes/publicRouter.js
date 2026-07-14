@@ -2,8 +2,8 @@ import { Router } from "express";
 
 const router = Router()
 
-import { getUserWithLinks } from "../controllers/adminController.js";
+import { getUserLinksPublic } from "../controllers/adminController.js";
 
-router.get("/get-user-with-links",getUserWithLinks)
+router.get("/get-user-links-public/:name",getUserLinksPublic)
 
 export default router 

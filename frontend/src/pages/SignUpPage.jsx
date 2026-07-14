@@ -2,8 +2,8 @@ import React from 'react'
 import Input from '../components/Input'
 import {motion} from 'framer-motion'
 import { useState } from 'react'
-import {Eye,EyeOff,UserRound,Mail,LockKeyhole,UserRoundPen,Camera} from 'lucide-react'
-import {useDispatch} from 'react-redux'
+import {Eye,EyeOff,UserRound,Mail,LockKeyhole,UserRoundPen,Camera, Loader} from 'lucide-react'
+import {useDispatch, useSelector} from 'react-redux'
 import { signup } from '../redux/userSlice'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
@@ -19,6 +19,8 @@ const SignUpPage = () => {
     const [bio, setbio] = useState("")
     const [photo, setphoto] = useState(<Camera/>)
     const [showPassword, setshowPassword] = useState(false)
+
+    const {isLoading,error} = useSelector((state)=>state.users)
    
     const toggleVisibility = async (e) => {
         e.preventDefault()
@@ -85,7 +87,7 @@ const SignUpPage = () => {
             <p className='text-[#7f92ac] font-semibold'>Already have an account ? Click <Link to="/signin" className='underline text-blue-500'>here</Link> to sign in</p>
             <motion.button className='w-full mt-5 py-3 px-4 rounded-2xl text-white bg-blue-600 hover:bg-blue-500' whileHover={{scale:1.05}} whileTap={{scale:0.7}}
             onClick={handleSignUp}
-            >Sign up</motion.button>
+            >{isLoading ? <Loader/> : "Sign up"}</motion.button>
     </div>
 </motion.div>
   )
