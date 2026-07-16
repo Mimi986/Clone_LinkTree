@@ -248,6 +248,7 @@ return (
             }
             </div>
       </motion.div>
+      {error && <p className='text-red-500 font-semibold mt-2'>{error}</p>}
       <button className='bg-red-500 text-white w-full mt-3 rounded-2xl py-3 hover:bg-red-400 hover:cursor-pointer' onClick={handleLogout}>Logout</button>
     </div>
   )

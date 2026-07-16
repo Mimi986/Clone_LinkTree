@@ -4,15 +4,24 @@ import { createSlice,createAsyncThunk } from '@reduxjs/toolkit'
 const baseUrl = "http://localhost:3000/api/auth"
 
 export const signup = createAsyncThunk("users/signup",
-    async({name,email,password,bio},{rejectWithValue})=>{
+    async({name,email,password,bio,photo},{rejectWithValue})=>{
         try{
+            const formData = new FormData()
+            formData.append("name",name)
+            formData.append("email",email)
+            formData.append("password",password)
+            formData.append("bio",bio)
+
+            if(photo){
+                formData.append("photo",photo)
+            }
         const response = await fetch(`${baseUrl}/signup`,{
             method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({name,email,password,bio})        })
+            body:formData,  //le navigateur va encoder automatiquement tout ça avec multipart/form-data
+            credentials:"include"
+            })
 
         const data = await response.json()
-
         if(!response.ok){
             return rejectWithValue(data.message || "error while signing up")
         }

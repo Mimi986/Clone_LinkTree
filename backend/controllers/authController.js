@@ -7,6 +7,10 @@ import { StatusCodes } from "http-status-codes";
 
 export const signup = async (req,res) => {
 const {name,email,password,photo,bio} = req.body 
+let photoUrl = null 
+if(req.file){
+    photoUrl = `/uploads/${req.file.filename}`    //construction de l'url
+}
 const adminAlreadyExists = await Admin.findOne({email})
 if(adminAlreadyExists) throw new BadRequestError('a user with this email already exists')
     const hashedPassword = await bcryptjs.hash(password,10)
@@ -14,12 +18,12 @@ if(adminAlreadyExists) throw new BadRequestError('a user with this email already
     name,
     email,
     password:hashedPassword,
-    photo,
+    photo:photoUrl,
     bio
 })
     await admin.save()
     generateTokenAndSetCookie(res,admin._id)
-    const { hidePassword, ...userWithoutPassword } = admin.toObject();
+    const { password: _, ...userWithoutPassword } = admin.toObject();
     res.status(StatusCodes.CREATED).json({msg:"user created successfully",admin:userWithoutPassword})}
 
 export const signin = async (req,res) => {
