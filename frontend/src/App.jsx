@@ -11,6 +11,7 @@ import { useEffect } from "react"
 import Header from "./components/Header"
 import ForgotPasswordPage from "./pages/ForgotPasswordPage"
 import ResetPasswordPage from "./pages/ResetPasswordPage"
+import Footer from "./components/Footer"
 
 const RedirectAuthenticateUser = ({children})=>{
     const {isAuthenticated,authChecked} = useSelector((state)=>state.users)
@@ -52,6 +53,7 @@ function App() {
          <Route path="/visitor-page/:name" element={<VisitorPage/>}/>
       </Routes>
      </div> 
+     <Footer></Footer>
     </>
   )
 }

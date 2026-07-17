@@ -1,12 +1,12 @@
 import React from 'react'
 import Input from '../components/Input'
 import { motion } from 'framer-motion'
-import { PencilLine,Plus,Check,X} from 'lucide-react'
-import { useState,useEffect} from 'react'
+import { PencilLine,Plus,Check,X,Camera} from 'lucide-react'
+import { useState,useEffect,useRef} from 'react'
 import LinkCard from '../components/LinkCard'
 import { useDispatch,useSelector } from 'react-redux'
 import { addLink,getAllLinks,activateLink,deactivateLink,deleteLink,editLink, reorderLinks } from '../redux/linkSlice'
-import { editInfos,getInfos, logout } from '../redux/userSlice'
+import { editInfos,editPhoto,getInfos, logout } from '../redux/userSlice'
 import DroppingArea from '../components/DroppingArea'
 
 const DashboardPage = () => {
@@ -21,9 +21,10 @@ const DashboardPage = () => {
   const [dest, setdest] = useState("")
   const [preview, setpreview] = useState(null)
   const [activeCard, setactiveCard] = useState(null)
+  const [save, setsave] = useState(false)
  
   const dispatch = useDispatch()
-
+  const inputRef = useRef(null)
   const {list : links,error} = useSelector((state)=>state.links || {})
   const {user} = useSelector((state)=>state.users)
 
@@ -107,12 +108,13 @@ const handleSubmit = async(e) => {
       e.preventDefault()
       try{
       await dispatch(editInfos({name,bio})).unwrap()
-      dispatch(getInfos())
-    }catch(error){
+      if(photo){
+      await dispatch(editPhoto(photo)).unwrap()}
+      if(save) dispatch(getInfos())
+      }catch(error){
       console.error(error)
     }
     }
-
     const handleLogout = async(e)=>{
       e.preventDefault()
       await dispatch(logout()).unwrap()
@@ -127,11 +129,20 @@ const handleSubmit = async(e) => {
       setactiveCard(null)
     }
 
-     const getPhotoUrl = (photo) => {
-    if(!photo) return null 
+      const getPhotoUrl = (photo) => {
+     if(!photo) return null 
     if(photo.startsWith('http')) return photo
-    return `http://localhost:3000${photo}`
-  }
+     return `http://localhost:3000${photo}`
+   }
+
+   const handlePhoto = (e) => {
+        const file = e.target.files[0]
+        if(!file) return ;
+        setphoto(file)
+        const reader = new FileReader()
+        reader.onload = () => setpreview(reader.result)  
+        reader.readAsDataURL(file)
+    }
 
 return (
     <div>
@@ -140,21 +151,30 @@ return (
       <motion.div className='bg-[#394864] border border-[#5f779d] rounded-2xl p-4 flex flex-col mt-4' 
       initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{delay:0.1}}>
         <div className='flex justify-between'>
-        <img className='w-15 h-15 rounded-full'  src={getPhotoUrl(user.photo)} alt={user.name}/>
-        <div className='flex flex-col'>
-        <h1>{name}</h1>
-        <p>{email}</p>
-        </div> 
+        <img className='w-15 h-15 rounded-full' src={getPhotoUrl(user.photo)} alt={user.name}/>
         <button className='text-blue-500 rounded-2xl border border-blue-300 hover:bg-gray-600 flex items-center gap-2 h-6 hover:cursor-pointer'
         onClick={()=>setisEditing(true)}>
           <PencilLine size={15} className='ml-2'/>
           <span className='mr-2'>Edit the profile</span></button>
         </div> 
           {isEditing && <motion.form initial={{opacity:0,y:15}} animate={{opacity:1,y:2}} transition={{delay:0.1}}
-          className='mt-2' onSubmit={handleSubmitInfos}
+          className='mt-2 bg-[#3e4f6f] rounded-xl p-3' onSubmit={handleSubmitInfos}
           >
-             <img/>
-             {/* <p className='text-gray-900 font-sans mb-4 mt-2'>Edit your profile picture</p> */}
+            <div className='flex gap-3'>
+            <div className='relative overflow-hidden flex justify-center mb-4 rounded-full h-15 w-15 border border-dashed border-[#5f779d] hover:border-blue-500 hover:cursor-pointer'
+            onClick={() => inputRef.current.click()}
+            >
+              {preview ? (
+                <>
+               <img className='w-full h-full object-cover' src={preview}/>
+               </>
+               ) : <Camera className='text-gray-800 m-4' size={20}/>
+                     }
+                  <input type="file" accept="image/*" className='hidden' ref={inputRef}
+                    onChange={handlePhoto}/>
+             </div>
+             <p className='text-[12px] mt-4 text-white font-sans'>Edit your profile picture</p>
+             </div>
              <Input
              type="text"
              placeholder=""
@@ -168,16 +188,22 @@ return (
             onChange={(e)=>setbio(e.target.value)}
             />
              <button className='hover:text-white text-gray-400 mr-3' type="button"
-            onClick={()=>setisEditing(false)}
+            onClick={()=>{
+              setname(user.name)
+              setbio(user.bio)
+              setphoto(null)
+              setpreview(null)
+              setsave(false)
+              setisEditing(false)}}
              >Cancel</button>
-             <button className='bg-blue-700 text-white rounded-xl hover:bg-blue-500 py-3 px-4' type="submit">Save</button>
+             <button className='bg-blue-700 text-white rounded-xl hover:bg-blue-500 py-3 px-4' type="submit" onClick={()=>setsave(true)}>Save</button>
           </motion.form> }
       </motion.div>
 
       <motion.div className='bg-[#394864] border border-[#5f779d] rounded-2xl p-4 flex flex-col mt-3 w-100' initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{delay:0.1}}>
         <div className='flex justify-between'>
-          <h1 className='text-gray-900 font-sans mb-2 text-[25px]'>Links</h1>
-          <button className='text-blue-500 hover:text-blue-300 flex'
+          <h1 className='text-blue-500 font-sans mb-2 text-[25px]'>Links</h1>
+          <button className='text-blue-500 hover:text-blue-300 flex hover:cursor-pointer'
           onClick={()=>setaddlink(true)}
           >
             <Plus size={30}/><span className='text-[23px]'>Add</span></button>

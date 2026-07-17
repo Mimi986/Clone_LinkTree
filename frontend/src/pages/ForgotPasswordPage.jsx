@@ -32,8 +32,8 @@ const handleSubmit = async(e) => {
             {!isSubmitted ? (
                 <form onSubmit={handleSubmit}>
                     <p className='text-gray-300 mb-6 text-center'>Enter your email address and we will send you a link to reset your password</p>
-                    <Input icon={Mail} type="email" placeholder="email address" value={email} onChange={(e)=>setemail(e.target.value)} required/>
-                    <motion.button className='mt-5 w-full py-3 px-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition duration-200'
+                    <Input icon={Mail} type="email" placeholder="Enter your email address" value={email} onChange={(e)=>setemail(e.target.value)} required/>
+                    <motion.button className='mt-5 w-full py-3 px-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-2xl shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition duration-200'
                     whileHover={{scale:1.02}} whileTap={{scale:0.98}} type="submit">
                         {isLoading ? "Loading..." : <p>send reset link</p>}
                         

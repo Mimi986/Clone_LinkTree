@@ -2,6 +2,8 @@ import Admin from "../models/adminModel.js";
 import { StatusCodes } from "http-status-codes";
 import Link from "../models/linkModel.js"
 import { BadRequestError, NotFoundError } from "../errors/customError.js";
+import fs from 'fs'
+import path from "path";
 
 export const addLink = async (req,res) => {
    const { title, dest } = req.body
@@ -60,6 +62,21 @@ export const editInfos = async (req,res) => {
   const {name,photo,bio } = req.body 
   const updatedInfosAdmin = await Admin.findByIdAndUpdate(adminId,{name,photo,bio},{new:true}).select('-password')
   res.status(StatusCodes.OK).json({msg:'user infos updated',updatedInfosAdmin})
+}
+
+export const editPhoto = async(req,res)=>{
+  const adminId = req.user.userId
+  if(!adminId) throw new NotFoundError("user not found")
+  const newPhotoPath = `/uploads/${req.file.filename}`
+  const admin = await Admin.findById(adminId)
+  if(!admin) throw new BadRequestError("user not found")
+  const oldPhoto = admin.photo
+  const updatedAdmin = await Admin.findByIdAndUpdate(adminId,{photo:newPhotoPath},{new:true}).select('-password')
+  const oldFullPath = path.join(process.cwd(), oldPhoto);    //process.cwd() renvoie le chemin absolu du projet 
+      if (fs.existsSync(oldFullPath)) {    //vérification de l'existence du fichier 
+        fs.unlinkSync(oldFullPath);     //suppression du fichier physique (l'ancienne photo)   => pour alléger le dossier uploads et ne pas le surcharger 
+      }
+  res.status(StatusCodes.OK).json({msg:'photo updated',updatedAdmin})
 }
 
 export const getInfos = async (req,res) => {   

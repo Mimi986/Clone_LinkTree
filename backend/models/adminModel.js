@@ -17,7 +17,7 @@ const adminSchema = new mongoose.Schema({
     },
     photo:{
         type:String,
-        default:'default_pdp_user.jpg'
+        default:'/uploads/default_pdp_user.jpg'
     },
     bio:{
         type:String,

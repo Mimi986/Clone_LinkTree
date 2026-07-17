@@ -11,7 +11,7 @@ const LoginPage = () => {
   const [email, setemail] = useState("")
   const [password, setpassword] = useState("")
 
-  const {error,isLoading} = useSelector((state)=>state.users)
+  const {error,isLoading,isAuthenticated} = useSelector((state)=>state.users)
 
   const dispatch = useDispatch()
   const navigate=useNavigate()
@@ -20,8 +20,8 @@ const LoginPage = () => {
     e.preventDefault()
     try{
     await dispatch(signin({email,password})).unwrap()
-    navigate("/dashboard")
-  }catch(error){
+    if(isAuthenticated) navigate("/dashboard")
+    }catch(error){
     return (error?.msg)
   }
   }
@@ -29,7 +29,7 @@ const LoginPage = () => {
     <motion.div className='flex justify-center items-center flex-col w-full' initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{duration:0.5}}>
         <h1 className='text-white text-2xl mb-2 font-semibold'>Welcome back</h1>
         <p className='text-[#49505a]'>Sign in to manage your profile</p>
-       <div className='mt-4 bg-[#1d2b45] border border-[#5f779d] rounded-3xl max-w-md w-full px-3 py-5'> 
+       <div className='mt-4 bg-[#394864] border border-[#5f779d] rounded-3xl max-w-md w-full px-3 py-5'> 
         <form>
         <div>
             <label className='text-[#6B82A0]'>Email</label>

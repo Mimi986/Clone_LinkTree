@@ -1,12 +1,13 @@
 import React from 'react'
 import Input from '../components/Input'
-import {motion} from 'framer-motion'
+import {motion,AnimatePresence} from 'framer-motion'
 import { useState,useRef } from 'react'
-import {Eye,EyeOff,UserRound,Mail,LockKeyhole,UserRoundPen,Camera, Loader} from 'lucide-react'
+import {Eye,EyeOff,UserRound,Mail,LockKeyhole,UserRoundPen,Camera, Loader,ArrowRight, Link2, Globe,Sparkles, Star} from 'lucide-react'
 import {useDispatch, useSelector} from 'react-redux'
 import { signup } from '../redux/userSlice'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
+import FloatingIcon from '../components/FloatingIcon'
 
 const SignUpPage = () => {
 
@@ -15,6 +16,7 @@ const SignUpPage = () => {
     const inputRef = useRef(null)
     const [photo, setphoto] = useState(null)
     const [showPassword, setshowPassword] = useState(false)
+    const [showForm, setshowForm] = useState(false)
 
     const [preview, setpreview] = useState(null)
 
@@ -53,6 +55,29 @@ const SignUpPage = () => {
     }
 
   return (
+    <div className='flex justify-center items-center flex-col w-full min-h-screen'>
+        <AnimatePresence mode="wait">
+        {!showForm ? (
+            <motion.div className='relative flex flex-col items-center text-center max-w-lg px-4' initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.4 }}>
+                <FloatingIcon icon={Link2}     className="top-0 left-0 md:-left-10"        size={28} delay={0}   duration={3.5} />
+                <FloatingIcon icon={Globe}     className="top-4 right-2 md:-right-12"      size={26} delay={0.4} duration={4} />
+                <FloatingIcon icon={Sparkles} className="top-1/3 -left-6 md:-left-20"     size={22} delay={0.8} duration={3.2} />
+                <FloatingIcon icon={Link2}    className="top-1/3 -right-6 md:-right-20"   size={24} delay={1.2} duration={3.8} />
+                <FloatingIcon icon={Globe}   className="bottom-10 left-2 md:-left-14"    size={20} delay={0.6} duration={3} />
+                <FloatingIcon icon={Sparkles}  className="bottom-4 right-4 md:-right-10"   size={22} delay={1}   duration={3.6} />
+                <FloatingIcon icon={Star}      className="top-1/2 left-1/4 md:-left-28"    size={18} delay={0.3} duration={4.2} />
+
+                <h1 className='text-blue-800 text-6xl mb-4 font-semibold font-serif'>Welcome to LinkTree</h1>
+                <p className='text-white text-xl mb-2 font-semibold'>Your professional hub , in one link</p>
+                <p className='text-[#303e52] mb-10 text-[18px]'>Create your profile, share your socials , your portfolio and so much more ,
+                    everyhting is rechable through one unique link.
+                </p>
+                <motion.button  className='flex items-center gap-2 py-3 px-8 rounded-2xl text-white bg-blue-600 hover:bg-blue-500 font-semibold' onClick={()=>setshowForm(true)} whileHover={{scale:1.05}} whileTap={{scale:0.7}}>Start</motion.button>
+            </motion.div>
+        ) : (
     <motion.div className='flex justify-center items-center flex-col w-full'>
         <h1 className='text-white text-2xl mb-2 font-semibold'>Create your profile</h1>
         <p className='text-[#2e3d52]'>Join other people in their professional journey!</p>
@@ -123,7 +148,9 @@ const SignUpPage = () => {
             onClick={handleSignUp}
             >{isLoading ? <Loader/> : "Sign up"}</motion.button>
     </div>
-</motion.div>
+</motion.div>)}
+</AnimatePresence>
+</div>
   )
 }
 

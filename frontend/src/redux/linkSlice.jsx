@@ -43,7 +43,7 @@ export const deleteLink = createAsyncThunk("links/deleteLink",
         if(!response.ok) return rejectWithValue(data)
         return data }
         catch(error){
-            rejectWithValue({ msg: error.message })
+            rejectWithValue(error.message)
         }
     }
 )

@@ -11,24 +11,21 @@ export const signup = createAsyncThunk("users/signup",
             formData.append("email",email)
             formData.append("password",password)
             formData.append("bio",bio)
-
             if(photo){
                 formData.append("photo",photo)
             }
-        const response = await fetch(`${baseUrl}/signup`,{
+            const response = await fetch(`${baseUrl}/signup`,{
             method:"POST",
             body:formData,  //le navigateur va encoder automatiquement tout ça avec multipart/form-data
             credentials:"include"
             })
-
-        const data = await response.json()
+            const data = await response.json()
         if(!response.ok){
             return rejectWithValue(data);
         }
         return data}
-        
         catch(error){
-            return rejectWithValue({ msg: error.message });
+            return rejectWithValue(error.message);
         }
         
     }
@@ -49,24 +46,22 @@ export const signin = createAsyncThunk("users/signin",
             }
             return data 
         } catch (error) {
-              return rejectWithValue({ msg: "error" });
+              return rejectWithValue(error.message);
         }
     }
 )
 
 export const logout = createAsyncThunk("users/logout",
-    async()=>{
+    async(_,{rejectWithValue})=>{
        try{ const response = await fetch(`${baseUrl}/logout`,{
             method:"GET",
             headers:{"Content-Type":"application/json"},
             credentials:"include"
-        }
-        )
+        })
         const data = await response.json()
         return data 
-    }
-        catch(error){
-            console.error(error)
+    }catch(error){
+            return rejectWithValue(error.message)
         }
     }
 )
@@ -83,9 +78,8 @@ export const forgotPassword = createAsyncThunk("users/forgotPassword",
         const data = await response.json()
         if(!response.ok) return rejectWithValue(data)
         return data 
-    }
-        catch(error){
-            return rejectWithValue({msg:error.msg})
+    }catch(error){
+            return rejectWithValue(error.message)
         }
     }
 )
@@ -101,9 +95,8 @@ export const resetPassword = createAsyncThunk("users/resetPassword",
         )
         const data = await response.json()
         return data 
-    }
-        catch(error){
-            return rejectWithValue({msg:error.message})
+    }catch(error){
+            return rejectWithValue(error.message)
         }
     }
 )
@@ -137,10 +130,28 @@ export const editInfos = createAsyncThunk("links/editInfos",
             return rejectWithValue("failed to update infos")
         }
         return data 
-    }
-    catch(error){
+    }catch(error){
         return rejectWithValue(error.message)
     }} 
+)
+
+export const editPhoto = createAsyncThunk("links/editPhoto",
+    async(photo,{rejectWithValue})=>{
+        try{
+            const formData=new FormData()
+            formData.append("photo",photo)
+            const response = await fetch(`http://localhost:3000/api/admin/edit-photo`,{
+                method:"PUT",
+                credentials:"include",
+                body:formData
+            })
+            const data = await response.json()
+            if(!response.ok) return rejectWithValue("failed top update the photo")
+                return data 
+        }catch(error){
+            return rejectWithValue(error.message)
+        }
+    }
 )
 
 export const getInfos = createAsyncThunk("links/get-infos",
@@ -156,7 +167,7 @@ export const getInfos = createAsyncThunk("links/get-infos",
         }
         return data 
     }catch(error){
-        return rejectWithValue({msg: error})
+        return rejectWithValue(error.message)
     }}
 )
 
@@ -277,6 +288,24 @@ const userSlice = createSlice({
             state.status="Failed"
             state.isLoading=false
             state.error=action.payload.msg
+         })
+
+         .addCase(editPhoto.fulfilled,(state,action)=>{
+            state.status = "Succeedded"
+            state.isLoading=false
+            const updated = action.payload.updatedAdmin
+            state.user = updated 
+         })
+
+         .addCase(editPhoto.pending,(state,action)=>{
+            state.status="Pending"
+            state.isLoading=true
+         })
+
+         .addCase(editPhoto.rejected,(state,action)=>{
+            state.status="Failed"
+            state.isLoading=false
+            state.error=action.payload
          })
 
          .addCase(getInfos.fulfilled,(state,action)=>{
