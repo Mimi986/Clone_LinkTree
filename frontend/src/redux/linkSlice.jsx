@@ -16,27 +16,35 @@ export const getAllLinks = createAsyncThunk("links/getAllLinks",
 )
 
 export const addLink = createAsyncThunk("links/addLink",
-    async(link)=>{
-        const response = await fetch (`${baseUrl}/add-link`,{
+    async(link,{rejectWithValue})=>{
+        try{const response = await fetch (`${baseUrl}/add-link`,{
             method:"POST",
             headers:{"Content-Type":"application/json"},
             credentials: "include",
             body:JSON.stringify(link)
         })
         const data = await response.json()
-        return data
+        if(!response.ok) return rejectWithValue(data)
+        return data}
+        catch(error){
+            rejectWithValue({ msg: error.message })
+        }
     }
 )
 
 export const deleteLink = createAsyncThunk("links/deleteLink",
     async(id)=>{
-        const response = await fetch(`${baseUrl}/delete-link/${id}`,{
+        try{const response = await fetch(`${baseUrl}/delete-link/${id}`,{
             method:"DELETE",
             headers:{"Content-Type":"application/json"},
             credentials:"include"
         })
         const data = await response.json()
-        return data 
+        if(!response.ok) return rejectWithValue(data)
+        return data }
+        catch(error){
+            rejectWithValue({ msg: error.message })
+        }
     }
 )
 
@@ -122,7 +130,7 @@ const linkSlice = createSlice({
         .addCase(getAllLinks.rejected,(state,action)=>{
             state.status = "Failed"
             state.isLoading=false
-            state.error = action.error.message
+            state.error = action.error.msg
         })
 
         .addCase(editLink.fulfilled,(state,action)=>{
@@ -135,7 +143,19 @@ const linkSlice = createSlice({
 
         .addCase(addLink.fulfilled,(state,action)=>{
             state.status="Succedded"
+            state.isLoading=false
             state.list.push(action.payload.link)
+        })
+
+        .addCase(addLink.pending,(state,action)=>{
+            state.status="Pending"
+            state.isLoading=true
+        })
+
+        .addCase(addLink.rejected,(state,action)=>{
+            state.status="Failed"
+            state.isLoading=false
+            state.error=action.payload.msg
         })
 
         .addCase(deleteLink.fulfilled,(state,action)=>{
@@ -176,7 +196,7 @@ const linkSlice = createSlice({
         .addCase(reorderLinks.rejected,(state,action)=>{
             state.status="Failed",
             state.isLoading=false,
-            state.error = action.payload 
+            state.error = action.payload.msg 
         })
         
     }

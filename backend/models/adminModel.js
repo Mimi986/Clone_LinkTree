@@ -24,6 +24,8 @@ const adminSchema = new mongoose.Schema({
         required:true,
         maxlength:200
     },
+    resetPasswordToken:String,   
+    resetPasswordExpiresAt:Date,
 })
 
 export default mongoose.model("Admin",adminSchema)

@@ -11,7 +11,7 @@ export const getUserLinksPublic = createAsyncThunk("links/getUserLinksPublic",
         })
         const data = await response.json()
         if(!response.ok){
-            return ("error in fetching the user or the links")
+            return rejectWithValue("error in fetching the user or the links")
         }
         return data }
     catch (error) {
@@ -26,6 +26,7 @@ const publicProfileSlice = createSlice({
     user:null,
     links:[],
     isLoading:false,
+    status:null,
     error:null
     },
     reducers:{},

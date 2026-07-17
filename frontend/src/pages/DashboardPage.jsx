@@ -14,11 +14,12 @@ const DashboardPage = () => {
   const [name, setname] = useState("")  
   const [email, setemail] = useState("")  
   const [bio, setbio] = useState("")
+  const [photo, setphoto] = useState(null)
   const [isEditing, setisEditing] = useState(false)
   const [addlink, setaddlink] = useState(false)
   const [title, settitle] = useState("")
   const [dest, setdest] = useState("")
-
+  const [preview, setpreview] = useState(null)
   const [activeCard, setactiveCard] = useState(null)
  
   const dispatch = useDispatch()
@@ -119,7 +120,6 @@ const handleSubmit = async(e) => {
 
     const onDrop = (position) => {
       if(activeCard==null || activeCard===undefined) return 
-
       const linkToMove = links[activeCard]
       const updatedLinks = links.filter((_,index)=>index!==activeCard)
       updatedLinks.splice(position,0,linkToMove)
@@ -127,14 +127,20 @@ const handleSubmit = async(e) => {
       setactiveCard(null)
     }
 
+     const getPhotoUrl = (photo) => {
+    if(!photo) return null 
+    if(photo.startsWith('http')) return photo
+    return `http://localhost:3000${photo}`
+  }
+
 return (
     <div>
       <h1 className='text-white font-semibold text-3xl mb-2'>Dashboard</h1>
       <p>{count} active link(s)</p>
       <motion.div className='bg-[#394864] border border-[#5f779d] rounded-2xl p-4 flex flex-col mt-4' 
-      initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{delay:0.2}}>
-        <div className='flex'>
-        <img alt="Profile Picture" className='w-20 h-20 rounded-full'/>
+      initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{delay:0.1}}>
+        <div className='flex justify-between'>
+        <img className='w-15 h-15 rounded-full'  src={getPhotoUrl(user.photo)} alt={user.name}/>
         <div className='flex flex-col'>
         <h1>{name}</h1>
         <p>{email}</p>
@@ -148,7 +154,7 @@ return (
           className='mt-2' onSubmit={handleSubmitInfos}
           >
              <img/>
-             <p className='text-gray-900 font-sans mb-4 mt-2'>Edit your profile picture</p>
+             {/* <p className='text-gray-900 font-sans mb-4 mt-2'>Edit your profile picture</p> */}
              <Input
              type="text"
              placeholder=""
@@ -168,7 +174,7 @@ return (
           </motion.form> }
       </motion.div>
 
-      <motion.div className='bg-[#394864] border border-[#5f779d] rounded-2xl p-4 flex flex-col mt-3 w-100'>
+      <motion.div className='bg-[#394864] border border-[#5f779d] rounded-2xl p-4 flex flex-col mt-3 w-100' initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{delay:0.1}}>
         <div className='flex justify-between'>
           <h1 className='text-gray-900 font-sans mb-2 text-[25px]'>Links</h1>
           <button className='text-blue-500 hover:text-blue-300 flex'
@@ -249,7 +255,7 @@ return (
             </div>
       </motion.div>
       {error && <p className='text-red-500 font-semibold mt-2'>{error}</p>}
-      <button className='bg-red-500 text-white w-full mt-3 rounded-2xl py-3 hover:bg-red-400 hover:cursor-pointer' onClick={handleLogout}>Logout</button>
+      <motion.button initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{delay:0.1}} className='bg-red-500 text-white w-full mt-3 rounded-2xl py-3 hover:bg-red-400 hover:cursor-pointer' onClick={handleLogout}>Logout</motion.button>
     </div>
   )
 }

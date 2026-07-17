@@ -13,10 +13,6 @@ const SignUpPage = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const inputRef = useRef(null)
-    // const [name, setname] = useState("")
-    // const [email, setemail] = useState("")
-    // const [password, setpassword] = useState("")
-    // const [bio, setbio] = useState("")
     const [photo, setphoto] = useState(null)
     const [showPassword, setshowPassword] = useState(false)
 
@@ -71,7 +67,7 @@ const SignUpPage = () => {
                     <img src={preview}
                     className='w-full h-full object-cover'/>
                     </>
-                    ): <Camera className='text-gray-800 m-4'/>}
+                    ): <Camera className='text-gray-800 m-6.5'/>}
                     <input type='file' accept="image/*" className='hidden'
                     ref={inputRef}
                     onChange={handlePhoto}

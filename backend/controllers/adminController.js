@@ -1,11 +1,12 @@
 import Admin from "../models/adminModel.js";
 import { StatusCodes } from "http-status-codes";
 import Link from "../models/linkModel.js"
-import { BadRequestError } from "../errors/customError.js";
+import { BadRequestError, NotFoundError } from "../errors/customError.js";
 
 export const addLink = async (req,res) => {
-  req.body.createdBy = req.user.userId
-  const count = Admin.countDocuments({user:req.user.userId})
+   const { title, dest } = req.body
+  const createdBy = req.user.userId
+  const count = await Admin.countDocuments({user:req.user.userId})
   const link = await Link.create({
     title,
     dest,
@@ -64,14 +65,14 @@ export const editInfos = async (req,res) => {
 export const getInfos = async (req,res) => {   
   const id = req.user.userId
   const user = await Admin.findById(id)
-   if(!user) throw new BadRequestError("user not found")
+   if(!user) throw new NotFoundError("user not found")
   res.status(StatusCodes.OK).json({msg:'infos retrieved',user})
 }
 
 export const getUserLinksPublic = async(req,res)=>{
   const {name} = req.params
   const user = await Admin.findOne({name}).select('-password') 
-  if(!user) throw new BadRequestError("user not found")
+  if(!user) throw new NotFoundError("user not found")
   const links = await Link.find({createdBy:user._id,active:true})
   res.status(StatusCodes.OK).json({msg:'user retrieved',user,links})
 }

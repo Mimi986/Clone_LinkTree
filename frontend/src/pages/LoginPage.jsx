@@ -18,11 +18,15 @@ const LoginPage = () => {
 
   const handleSignIn = async(e) => {
     e.preventDefault()
-    dispatch(signin({email,password}))
+    try{
+    await dispatch(signin({email,password})).unwrap()
     navigate("/dashboard")
+  }catch(error){
+    return (error?.msg)
+  }
   }
   return (
-    <motion.div className='flex justify-center items-center flex-col w-full'>
+    <motion.div className='flex justify-center items-center flex-col w-full' initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{duration:0.5}}>
         <h1 className='text-white text-2xl mb-2 font-semibold'>Welcome back</h1>
         <p className='text-[#49505a]'>Sign in to manage your profile</p>
        <div className='mt-4 bg-[#1d2b45] border border-[#5f779d] rounded-3xl max-w-md w-full px-3 py-5'> 

@@ -11,7 +11,7 @@ const DroppingArea = ({onDrop}) => {
     }}
     onDragOver={e => e.preventDefault()}
     className='w-full border border-dashed border-[#140606] rounded-3xl p-1' animate={{opacity: showDrop? 1 : 0}} transition={{duration:0.2}}>
-        Drop here</motion.section>
+        </motion.section>
   )
 }
 

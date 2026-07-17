@@ -2,8 +2,9 @@ import Admin from "../models/adminModel.js";
 import bcryptjs from "bcryptjs"
 import crypto from "crypto"
 import { generateTokenAndSetCookie } from "../utils/generateTokenAndSetCookie.js";
-import { BadRequestError,UnauthenticatedError} from "../errors/customError.js";
+import { BadRequestError,NotFoundError,UnauthenticatedError} from "../errors/customError.js";
 import { StatusCodes } from "http-status-codes";
+import {sendPasswordResetEmail,sendResetSuccessEmail} from '../nodemailer/email.js'
 
 export const signup = async (req,res) => {
 const {name,email,password,photo,bio} = req.body 
@@ -40,6 +41,33 @@ export const signin = async (req,res) => {
 export const logout = async(req,res) => {
     res.clearCookie("token")
     res.status(StatusCodes.OK).json({msg:'logged out successfully'})
+}
+
+export const forgotPassword = async (req,res) => {
+    const {email} = req.body 
+        const user = await Admin.findOne({email})
+        if(!user) throw new NotFoundError("user not found")
+        const resetToken = crypto.randomBytes(20).toString("hex")   
+        const resetTokenExpiresAt = Date.now() + 1*60*60*1000
+        user.resetPasswordToken = resetToken 
+        user.resetPasswordExpiresAt = resetTokenExpiresAt
+        await user.save()
+        await sendPasswordResetEmail(user.email,`${process.env.CLIENT_URL}/reset-password/${resetToken}`)
+        res.status(StatusCodes.OK).json({msg:'link to reset your password has been sent to your email'})
+}
+
+export const resetPassword = async (req,res) => {
+        const {token} = req.params 
+        const {password} = req.body 
+        const user = await Admin.findOne({resetPasswordToken:token,resetPasswordExpiresAt:{$gt:Date.now()}})    
+        if(!user) throw new NotFoundError("user not found")
+        const hashedPassword = await bcryptjs.hash(password,10)   
+        user.password = hashedPassword
+        user.resetPasswordToken = undefined 
+        user.resetPasswordExpiresAt = undefined 
+        await user.save()
+        await sendResetSuccessEmail(user.email)
+        res.status(StatusCodes.OK).json({msg:'user created successfully'})
 }
 
 export const checkAuth = async(req,res) => {

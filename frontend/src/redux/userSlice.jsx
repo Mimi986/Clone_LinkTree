@@ -23,12 +23,12 @@ export const signup = createAsyncThunk("users/signup",
 
         const data = await response.json()
         if(!response.ok){
-            return rejectWithValue(data.message || "error while signing up")
+            return rejectWithValue(data);
         }
         return data}
         
         catch(error){
-            console.error(error)
+            return rejectWithValue({ msg: error.message });
         }
         
     }
@@ -45,11 +45,11 @@ export const signin = createAsyncThunk("users/signin",
             })
             const data = await response.json()
             if(!response.ok){
-                return rejectWithValue(data.message || "error while signing in")
+                return rejectWithValue(data);
             }
             return data 
         } catch (error) {
-             console.error(error)
+              return rejectWithValue({ msg: "error" });
         }
     }
 )
@@ -67,6 +67,43 @@ export const logout = createAsyncThunk("users/logout",
     }
         catch(error){
             console.error(error)
+        }
+    }
+)
+
+export const forgotPassword = createAsyncThunk("users/forgotPassword",
+    async(email,{rejectWithValue})=>{
+       try{ const response = await fetch(`${baseUrl}/forgot-password`,{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body: JSON.stringify({email}),
+            credentials:"include"
+        }
+        )
+        const data = await response.json()
+        if(!response.ok) return rejectWithValue(data)
+        return data 
+    }
+        catch(error){
+            return rejectWithValue({msg:error.msg})
+        }
+    }
+)
+
+export const resetPassword = createAsyncThunk("users/resetPassword",
+    async({token,password},{rejectWithValue})=>{
+       try{ const response = await fetch(`${baseUrl}/reset-password/${token}`,{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body: JSON.stringify({password}),
+            credentials:"include"
+        }
+        )
+        const data = await response.json()
+        return data 
+    }
+        catch(error){
+            return rejectWithValue({msg:error.message})
         }
     }
 )
@@ -111,7 +148,7 @@ export const getInfos = createAsyncThunk("links/get-infos",
         try{const response = await fetch(`http://localhost:3000/api/admin/get-infos`,{
             method:"GET",
             headers:{"Content-Type":"application/json"},
-            credentials:"include"
+            credentials:"include",
         })
         const data = await response.json()
         if(!response.ok){
@@ -119,7 +156,7 @@ export const getInfos = createAsyncThunk("links/get-infos",
         }
         return data 
     }catch(error){
-        console.error(error)
+        return rejectWithValue({msg: error})
     }}
 )
 
@@ -151,7 +188,7 @@ const userSlice = createSlice({
 
          .addCase(signup.rejected,(state,action)=>{
             state.isLoading=false
-            state.error = action.payload
+            state.error = action.payload.msg
             state.isAuthenticated=false
         })
 
@@ -170,7 +207,7 @@ const userSlice = createSlice({
          .addCase(signin.rejected,(state,action)=>{
             state.isLoading=false
             state.isAuthenticated=false
-            state.error = action.payload
+            state.error = action.payload.msg
         })
 
          .addCase(logout.fulfilled,(state)=>{
@@ -178,6 +215,36 @@ const userSlice = createSlice({
             state.isLoading=false
             state.error=null
             state.isAuthenticated=false 
+        })
+
+        .addCase(forgotPassword.fulfilled,(state,action)=>{
+            state.isLoading=false 
+            state.error=null
+        })
+
+         .addCase(forgotPassword.pending,(state,action)=>{
+            state.isLoading=true
+            state.error=null
+        })
+
+         .addCase(forgotPassword.rejected,(state,action)=>{
+            state.isLoading=false
+            state.error = action.payload.msg
+        })
+
+        .addCase(resetPassword.fulfilled,(state,action)=>{
+            state.isLoading=false 
+            state.error=null
+        })
+
+         .addCase(resetPassword.pending,(state,action)=>{
+            state.isLoading=true
+            state.error=null
+        })
+
+         .addCase(resetPassword.rejected,(state,action)=>{
+            state.isLoading=false
+            state.error = action.payload.msg
         })
 
         .addCase(checkAuth.fulfilled,(state,action)=>{
@@ -209,7 +276,7 @@ const userSlice = createSlice({
          .addCase(editInfos.rejected,(state,action)=>{
             state.status="Failed"
             state.isLoading=false
-            state.error=action.payload 
+            state.error=action.payload.msg
          })
 
          .addCase(getInfos.fulfilled,(state,action)=>{
@@ -226,7 +293,7 @@ const userSlice = createSlice({
         .addCase(getInfos.rejected,(state,action)=>{
             state.status="Failed"
             state.isLoading=false
-            state.error=action.payload 
+            state.error=action.payload.msg
          })         
     
     }

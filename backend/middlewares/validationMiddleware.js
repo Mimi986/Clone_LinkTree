@@ -10,7 +10,10 @@ export const withValidationsErrors = (validationValues) => {  //faut que j'ajout
         (req,res,next) => {
             const errors = validationResult(req)
              if(!errors.isEmpty()){
-                const errorsMessage = errors.array().map((error)=>error.msg)
+                const errorsMessages = errors.array().map((error)=>error.msg)
+                if(errorsMessages[0].startsWith("no link")){
+                    throw new NotFoundError(errorsMessages)
+                }
                 throw new BadRequestError (errorsMessage)
              }
              next()
@@ -55,6 +58,6 @@ export const validateLinkInput = withValidationsErrors([
 export const validateUpdateInfosInput = withValidationsErrors([
     body("name").optional().notEmpty().withMessage("name cannot be empty"),
     body("bio").optional().isLength({max:200}).withMessage("bio cannot be empty")
-    //je dois rajouter la photo
+    //body("photo").optional()
 ])
 
