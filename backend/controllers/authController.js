@@ -76,7 +76,6 @@ export const checkAuth = async(req,res) => {
         if(!user) throw new BadRequestError("user not found")
         res.status(StatusCodes.OK).json({msg:"authenticated",user})  
     } catch (error) {
-        console.log("error in check auth",error)
         throw new UnauthenticatedError ("error in checkauth")
     }
 }

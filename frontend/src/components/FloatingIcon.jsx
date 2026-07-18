@@ -1,4 +1,4 @@
-import {motion, AnimatePresence} from 'framer-motion'
+import {motion} from 'framer-motion'
 
 const FloatingIcon = ({ icon: Icon, className, size = 24, delay = 0, duration = 3 }) => (
   <motion.div

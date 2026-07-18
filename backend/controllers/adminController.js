@@ -16,7 +16,6 @@ export const addLink = async (req,res) => {
     position:count
   })
   res.status(StatusCodes.CREATED).json({msg:'link added successfully',link})
-
 }
 
 export const editLink = async (req,res) => {

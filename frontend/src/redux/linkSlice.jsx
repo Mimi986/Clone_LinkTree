@@ -27,7 +27,7 @@ export const addLink = createAsyncThunk("links/addLink",
         if(!response.ok) return rejectWithValue(data)
         return data}
         catch(error){
-            rejectWithValue({ msg: error.message })
+            return rejectWithValue(error.msg)
         }
     }
 )
@@ -43,7 +43,7 @@ export const deleteLink = createAsyncThunk("links/deleteLink",
         if(!response.ok) return rejectWithValue(data)
         return data }
         catch(error){
-            rejectWithValue(error.message)
+            rejectWithValue(error.msg)
         }
     }
 )
@@ -111,9 +111,6 @@ const linkSlice = createSlice({
         error:null
     },
     reducers:{
-        // reorderLinks:(state,action)=>{
-        //     state.list = action.payload 
-        // }
     },
     extraReducers:(builder)=>{
         builder

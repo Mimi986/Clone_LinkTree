@@ -27,7 +27,7 @@ const SignUpPage = () => {
         bio:""
     })
 
-    const {isLoading,error} = useSelector((state)=>state.users)
+    const {isLoading,error,isAuthenticated} = useSelector((state)=>state.users)
    
     const toggleVisibility = async (e) => {
         e.preventDefault()
@@ -36,8 +36,13 @@ const SignUpPage = () => {
 
     const handleSignUp = async(e) => {
         e.preventDefault()
+        try{
         await dispatch(signup({...formValues,photo}))
-        navigate("/dashboard")
+        if(isAuthenticated) navigate("/dashboard")
+        }
+        catch(error){
+            return (error?.msg)
+        }
     }
 
         const handleChange = (e) => {

@@ -14,7 +14,7 @@ export const withValidationsErrors = (validationValues) => {  //faut que j'ajout
                 if(errorsMessages[0].startsWith("no link")){
                     throw new NotFoundError(errorsMessages)
                 }
-                throw new BadRequestError (errorsMessage)
+                throw new BadRequestError (errorsMessages)
              }
              next()
         }

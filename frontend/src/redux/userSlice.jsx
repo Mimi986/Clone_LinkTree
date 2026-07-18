@@ -25,7 +25,7 @@ export const signup = createAsyncThunk("users/signup",
         }
         return data}
         catch(error){
-            return rejectWithValue(error.message);
+            return rejectWithValue(error.msg);
         }
         
     }
@@ -46,7 +46,7 @@ export const signin = createAsyncThunk("users/signin",
             }
             return data 
         } catch (error) {
-              return rejectWithValue(error.message);
+              return rejectWithValue(error.msg);
         }
     }
 )
@@ -61,7 +61,7 @@ export const logout = createAsyncThunk("users/logout",
         const data = await response.json()
         return data 
     }catch(error){
-            return rejectWithValue(error.message)
+            return rejectWithValue(error.msg)
         }
     }
 )
@@ -79,7 +79,7 @@ export const forgotPassword = createAsyncThunk("users/forgotPassword",
         if(!response.ok) return rejectWithValue(data)
         return data 
     }catch(error){
-            return rejectWithValue(error.message)
+            return rejectWithValue(error.msg)
         }
     }
 )
@@ -96,7 +96,7 @@ export const resetPassword = createAsyncThunk("users/resetPassword",
         const data = await response.json()
         return data 
     }catch(error){
-            return rejectWithValue(error.message)
+            return rejectWithValue(error.msg)
         }
     }
 )
@@ -131,7 +131,7 @@ export const editInfos = createAsyncThunk("links/editInfos",
         }
         return data 
     }catch(error){
-        return rejectWithValue(error.message)
+        return rejectWithValue(error.msg)
     }} 
 )
 
@@ -149,7 +149,7 @@ export const editPhoto = createAsyncThunk("links/editPhoto",
             if(!response.ok) return rejectWithValue("failed top update the photo")
                 return data 
         }catch(error){
-            return rejectWithValue(error.message)
+            return rejectWithValue(error.msg)
         }
     }
 )
@@ -167,7 +167,7 @@ export const getInfos = createAsyncThunk("links/get-infos",
         }
         return data 
     }catch(error){
-        return rejectWithValue(error.message)
+        return rejectWithValue(error.msg)
     }}
 )
 

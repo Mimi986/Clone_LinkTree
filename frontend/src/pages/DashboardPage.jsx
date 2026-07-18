@@ -45,7 +45,7 @@ const DashboardPage = () => {
       settitle("")
       setdest("")
 }    catch(error){
-  console.log("error in adding link",error)
+  return (error?.msg)
 }
 }
 
@@ -70,7 +70,7 @@ const DashboardPage = () => {
       await dispatch(editLink(link)).unwrap()
       dispatch(getAllLinks())
     } catch(error){
-      console.log("error in editing link",error)
+      return (error?.msg)
     }
   }
 const [editingLink,seteditingLink] = useState(null)
@@ -112,7 +112,7 @@ const handleSubmit = async(e) => {
       await dispatch(editPhoto(photo)).unwrap()}
       if(save) dispatch(getInfos())
       }catch(error){
-      console.error(error)
+      return (error?.msg)
     }
     }
     const handleLogout = async(e)=>{
